@@ -1,0 +1,12 @@
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+    {
+        path: '',
+        loadComponent: () => import('./pages/landing/landing').then(m => m.Landing),
+    },
+    {
+        path: 'editor',
+        loadComponent: () => import('./pages/editor-view/editor-view').then(m => m.EditorView),
+    },
+];

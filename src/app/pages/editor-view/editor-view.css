@@ -1,0 +1,11 @@
+ body {
+     padding-top: 56px;
+     overflow: hidden;
+     padding-bottom: 40px;
+     /* Space for footer */
+ }
+
+ /* Override default for editor */
+ .navbar {
+     z-index: 1040;
+ }

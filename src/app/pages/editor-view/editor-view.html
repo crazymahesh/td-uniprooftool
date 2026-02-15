@@ -1,0 +1,290 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center p-0" href="index.html" style="font-size: 1.3rem;">
+            <img src="img/td-logo.png" alt="Logo" height="35">
+            <span style="background-color: #000; color: white;" class="px-1">Thomson</span>
+            <span style="background-color: var(--primary-color); color: white;" class="px-1">Digital</span>
+            <h4
+                style="margin-bottom: 0; font-size: 1.3rem; margin-left: 15px; color: black;font-size: 1.3rem;font-weight: 600;">
+                Uniproof Tool</h4>
+        </a>
+        <div class="d-flex align-items-center ms-auto">
+            <span class="text-secondary me-3 small"><i class="fas fa-check-circle me-1"></i> Saved</span>
+            <button class="btn btn-outline-primary btn-sm me-2">Save</button>
+            <button class="btn btn-primary btn-sm me-2 fw-bold">Submit</button>
+            <button class="btn btn-outline-primary btn-sm me-2">Preview</button>
+            <div class="ms-3 text-end">
+                <div class="d-inline-block text-end">
+                    <div class="fw-bold lh-1" style="font-size: 0.75rem;">mahesh.amirthalingam@xyz.com
+                    </div>
+                    <div class="text-muted small lh-1 mt-1" style="font-size: 0.75rem;">Author</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="row g-0">
+    <!-- Left Sidebar (Insert Actions) -->
+    <!-- Left Sidebar (Tabs: Figures, Search, Attachments) -->
+    <div class="col-md-2 bg-light border-end editor-sidebar d-flex flex-column p-0">
+        <!-- Tabs Header -->
+        <ul class="nav nav-tabs nav-fill small" id="leftSidebarTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active py-2" id="figures-tab" data-bs-toggle="tab" data-bs-target="#figures"
+                    type="button" role="tab" title="Figures"><i class="fas fa-image"></i></button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link py-2" id="search-tab" data-bs-toggle="tab" data-bs-target="#search"
+                    type="button" role="tab" title="Search"><i class="fas fa-search"></i></button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link py-2" id="attachments-tab" data-bs-toggle="tab" data-bs-target="#attachments"
+                    type="button" role="tab" title="Attachments"><i class="fas fa-paperclip"></i></button>
+            </li>
+        </ul>
+
+        <!-- Tabs Content -->
+        <div class="tab-content p-3 flex-grow-1 overflow-auto" id="leftSidebarTabContent">
+            <!-- Figures Tab -->
+            <div class="tab-pane fade show active" id="figures" role="tabpanel">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">Figures</h6>
+                <div class="tree-view">
+                    <div class="mb-2">
+                        <div class="fw-bold small"><i class="fas fa-folder-open me-2 text-warning"></i>Figure</div>
+                        <ul class="list-unstyled ms-4 small mt-1">
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.1</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.2</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.3</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.4</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.5</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.6</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.7</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.8</a></li>
+                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
+                                        class="fas fa-image me-2 text-muted"></i>Fig 5.9</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Tab -->
+            <div class="tab-pane fade" id="search" role="tabpanel">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">Search</h6>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search document...">
+                    <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+
+            <!-- Attachments Tab -->
+            <div class="tab-pane fade" id="attachments" role="tabpanel">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">Attachments</h6>
+                <div class="text-center text-muted py-5">
+                    <i class="fas fa-paperclip fa-3x mb-3 opacity-25"></i>
+                    <p class="small">No attachments</p>
+                    <button class="btn btn-outline-primary btn-sm">Add File</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Editor Area (Middle) -->
+    <div class="col-md-7 p-0 bg-white">
+        <!-- Top Toolbar (Basic Actions) -->
+        <!-- <div
+            class="editor-toolbar d-flex align-items-center px-4 py-2 border-bottom sticky-top bg-white flex-wrap gap-2">
+
+            <button class="btn btn-light btn-sm" title="Bold"><i class="fas fa-bold"></i></button>
+            <button class="btn btn-light btn-sm" title="Italic"><i class="fas fa-italic"></i></button>
+            <button class="btn btn-light btn-sm" title="Underline"><i class="fas fa-underline"></i></button>
+
+            <div class="vr mx-1"></div>
+
+            <button class="btn btn-light btn-sm" title="Symbols"><i class="fas fa-icons"></i></button>
+            <button class="btn btn-light btn-sm" title="Insert Note"><i class="fas fa-sticky-note"></i></button>
+            <button class="btn btn-light btn-sm" title="Insert Link"><i class="fas fa-link"></i></button>
+            <button class="btn btn-light btn-sm" title="Insert Table"><i class="fas fa-table"></i></button>
+
+            <div class="vr mx-1"></div>
+
+            <button class="btn btn-light btn-sm" title="Insert Citation"><i class="fas fa-quote-right"></i></button>
+            <button class="btn btn-light btn-sm" title="Reference"><i class="fas fa-book"></i></button>
+            <button class="btn btn-light btn-sm" title="Equation"><i class="fas fa-square-root-alt"></i></button>
+        </div> -->
+
+        <!-- Writing Canvas -->
+        <app-editor-component></app-editor-component>
+                
+                
+                
+          
+    </div>
+
+    <!-- Right Sidebar (Comments & Track Changes) -->
+    <div class="col-md-3 bg-light border-start p-0" style="height: calc(100vh - 56px - 40px); overflow-y: auto;">
+        <div class="p-2 border-bottom bg-white sticky-top d-flex justify-content-between align-items-center">
+            <!-- Left Icons -->
+            <div class="d-flex">
+                <button class="btn btn-link btn-sm text-secondary" title="Pin"><i class="fas fa-thumbtack"></i></button>
+                <button class="btn btn-link btn-sm text-secondary" title="Refresh"><i
+                        class="fas fa-sync-alt"></i></button>
+            </div>
+            <!-- Right Tabs -->
+            <ul class="nav nav-pills nav-fill small gap-1" id="rightSidebarTab" role="tablist">
+                <li class="nav-item border-end border-start" role="presentation">
+                    <a class="nav-link active py-1 px-2 rounded-0" id="comments-tab" data-bs-toggle="tab"
+                        data-bs-target="#comments" type="button" role="tab" title="Comments" href="#comments"><i
+                            class="fas fa-comment-alt"></i></a>
+                </li>
+                <li class="nav-item border-end" role="presentation">
+                    <a class="nav-link py-1 px-2 rounded-0" id="changes-tab" data-bs-toggle="tab"
+                        data-bs-target="#changes" type="button" role="tab" title="Track Changes" href="#changes"><i
+                            class="fas fa-history"></i></a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content p-3" id="rightSidebarTabContent">
+            <!-- Comments Tab -->
+            <div class="tab-pane fade show active" id="comments" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-1">
+                    <h6 class="fw-bold text-muted text-uppercase small mb-0">Comments <span
+                            class="badge bg-secondary rounded-pill ms-1">2</span></h6>
+                    <button
+                        class="btn btn-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center"
+                        style="width: 24px; height: 24px;" title="New Comment"><i class="fas fa-plus"
+                            style="font-size: 12px;"></i></button>
+                </div>
+
+                <!-- Filters -->
+                <div class="d-flex justify-content-between mb-3 bg-light p-2 rounded border-bottom">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" style="padding: 0.1rem 0.5rem; font-size: 0.75rem;">
+                            Users: All
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All</a></li>
+                            <li><a class="dropdown-item" href="#">Editor A</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" style="padding: 0.1rem 0.5rem; font-size: 0.75rem;">
+                            Type: All
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All</a></li>
+                            <li><a class="dropdown-item" href="#">General</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="fw-bold">Editor A</small>
+                            <small class="text-muted">10:42 AM</small>
+                        </div>
+                        <p class="small mb-1">Check the pacing here. Feels a bit rushed.</p>
+                        <a href="#" class="text-decoration-none small">Reply</a>
+                    </div>
+                </div>
+                <div class="card mb-3 border-0 shadow-sm">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <small class="fw-bold">Editor B</small>
+                            <small class="text-muted">Yesterday</small>
+                        </div>
+                        <p class="small mb-1">Great description of the atmosphere!</p>
+                        <a href="#" class="text-decoration-none small">Reply</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track Changes Tab -->
+            <div class="tab-pane fade" id="changes" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="fw-bold text-muted text-uppercase small mb-0">Track Changes</h6>
+                    <span class="badge bg-secondary rounded-pill">2</span>
+                </div>
+
+                <!-- Filters Row 1 -->
+                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" style="padding: 0.1rem 0.5rem; font-size: 0.75rem;">
+                            Users: All
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All</a></li>
+                        </ul>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" style="padding: 0.1rem 0.5rem; font-size: 0.75rem;">
+                            View: All
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Filters Row 2 -->
+                <div class="mb-3 bg-light p-2 rounded border-bottom">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="tcFilter" id="tcAll" value="all" checked
+                            style="transform: scale(0.8);">
+                        <label class="form-check-label small" for="tcAll">All</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="tcFilter" id="tcPara" value="paragraph"
+                            style="transform: scale(0.8);">
+                        <label class="form-check-label small" for="tcPara">Paragraph</label>
+                    </div>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 small fw-bold text-success">Added Text</h6>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                        <p class="mb-1 small fst-italic">"flash of lightning"</p>
+                    </div>
+                    <div class="list-group-item bg-transparent px-0">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 small fw-bold text-danger">Deleted Text</h6>
+                            <small class="text-muted">5 mins ago</small>
+                        </div>
+                        <p class="mb-1 small text-decoration-line-through text-muted">"darkness"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="fixed-bottom bg-black text-white px-3"
+    style="min-height: 40px; z-index: 1050; display: flex; align-items: center; justify-content: flex-end;">
+    <div class="d-flex align-items-center small">
+        <span class="me-3 text-white-50">Last saved a few seconds ago</span>
+        <div class="d-flex align-items-center border-start border-secondary ps-3">
+            <i class="fas fa-search-minus me-2 text-white-50"></i>
+            <input type="range" class="form-range" min="1" max="100" value="100" id="zoomRange" style="width: 100px;">
+            <i class="fas fa-search-plus ms-2 text-white-50"></i>
+            <span class="ms-2">100%</span>
+        </div>
+    </div>
+</footer>

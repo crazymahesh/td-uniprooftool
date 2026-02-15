@@ -1,0 +1,217 @@
+
+.NgxEditor {
+    border:none !important;
+    box-shadow:none !important;
+}
+/* Table Dropdown Styles */
+.table-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.table-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem 0.5rem;
+}
+
+.table-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: 0.25rem;
+  z-index: 1000;
+  min-width: 280px;
+}
+
+/* Grid Selector */
+.table-grid-selector {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.grid-label {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.75rem;
+  min-height: 1.25rem;
+}
+
+.grid-container {
+  display: inline-block;
+  padding: 0.25rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  width:100%
+}
+
+.grid-row {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 2px;
+  width:100%
+}
+
+.grid-row:last-child {
+  margin-bottom: 0;
+}
+
+.grid-cell {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #dee2e6;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.grid-cell:hover {
+  border-color: #007bff;
+}
+
+.grid-cell.hovered {
+  background: #007bff;
+  border-color: #0056b3;
+}
+
+/* Table Operations */
+.table-operations {
+  padding: 0.5rem;
+}
+
+.operation-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+}
+
+.operation-section:not(:last-child) {
+  border-bottom: 1px solid #e9ecef;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.5rem;
+}
+
+.operation-btn {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  background: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #495057;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.operation-btn:hover {
+  background: #f8f9fa;
+  color: #212529;
+}
+
+.operation-btn.danger {
+  color: #dc3545;
+}
+
+.operation-btn.danger:hover {
+  background: #fff5f5;
+}
+
+.operation-icon {
+  font-size: 1rem;
+  width: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+
+
+/* Table styles */
+.custom-editor table,
+ngx-editor table,
+.writing-area table,
+.ProseMirror table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  width: 100%;
+  margin: 1rem 0;
+  overflow: hidden;
+  border: 1px solid #dcdcdc !important;
+}
+
+.custom-editor th,
+.custom-editor td,
+ngx-editor th,
+ngx-editor td,
+.writing-area th,
+.writing-area td,
+.ProseMirror th,
+.ProseMirror td {
+  border: 1px solid #dcdcdc !important;
+  padding: 8px 12px;
+  vertical-align: top;
+  min-width: 50px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.custom-editor th,
+ngx-editor th,
+.writing-area th,
+.ProseMirror th {
+  background: #f5f7fa;
+  font-weight: 600;
+  text-align: left;
+}
+
+.custom-editor .selectedCell,
+ngx-editor .selectedCell,
+.writing-area .selectedCell,
+.ProseMirror .selectedCell {
+  background: #e3f2fd;
+}
+
+.custom-editor .column-resize-handle,
+ngx-editor .column-resize-handle,
+.writing-area .column-resize-handle,
+.ProseMirror .column-resize-handle {
+  position: absolute;
+  right: -3px;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: rgba(60, 120, 240, 0.3);
+  cursor: col-resize;
+  z-index: 10;
+}
+
+.custom-editor.resize-cursor,
+ngx-editor.resize-cursor,
+.writing-area.resize-cursor,
+.ProseMirror.resize-cursor {
+  cursor: col-resize;
+}
+
+.NgxEditor__MenuBar {
+    background: #f8f9fa !important;   
+}
+.NgxEditor .NgxEditor__MenuBar {
+    background: rgb(248 249 250) !important;
+    /* color:#fff !important; */
+        border: 2px solid #6f6f6f;
+}
+.NgxEditor .NgxEditor__MenuItem .NgxEditor__MenuItem--Icon:hover {
+    
+    color:#000 !important;
+}
