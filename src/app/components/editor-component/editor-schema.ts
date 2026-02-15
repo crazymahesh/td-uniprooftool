@@ -33,7 +33,18 @@ const nodes = ngxSchema.spec.nodes.append(tables);
 
 export const tableSchema = new Schema({
   nodes,
-  marks: ngxSchema.spec.marks,
+  marks: ngxSchema.spec.marks.append({
+    insertion: {
+      attrs: { id: { default: null } },
+      parseDOM: [{ tag: 'span.insertion', getAttrs: (dom: any) => ({ id: dom.getAttribute('data-id') }) }],
+      toDOM(mark) { return ['span', { class: 'insertion', 'data-id': mark.attrs['id'], style: 'color: green; text-decoration: underline;' }, 0]; }
+    },
+    deletion: {
+      attrs: { id: { default: null } },
+      parseDOM: [{ tag: 'span.deletion', getAttrs: (dom: any) => ({ id: dom.getAttribute('data-id') }) }],
+      toDOM(mark) { return ['span', { class: 'deletion', 'data-id': mark.attrs['id'], style: 'color: red; text-decoration: line-through;' }, 0]; }
+    }
+  }),
 });
 
 /**

@@ -2,6 +2,9 @@ import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxEditorModule, Editor, Toolbar, NgxEditorFloatingMenuComponent } from 'ngx-editor';
+import { CommentService } from '../../services/comment.service';
+import { TrackChangesService } from '../../services/track-changes.service';
+import { trackChangesPlugin } from './track-changes-plugin';
 
 // 🔹 Table schema & PM plugins
 import { Schema, Node as PMNode, Fragment } from 'prosemirror-model';
@@ -30,7 +33,7 @@ import { tableSchema } from './editor-schema';
   styleUrl: './editor-component.css',
   encapsulation: ViewEncapsulation.None,
 })
-export class EditorComponent implements OnInit, OnDestroy{
+export class EditorComponent implements OnInit, OnDestroy {
 
   htmlContent = `<h4>Chapter 1: The Beginning</h4><h2 class="h4 fw-bold mb-3">1.1 Introduction to Neural Networks</h2>
                 <p class="mb-3">Neural networks are a subset of machine learning and are at the heart of deep
@@ -230,6 +233,7 @@ export class EditorComponent implements OnInit, OnDestroy{
   schema!: Schema;
 
   toolbar: Toolbar = [
+    ['undo', 'redo'],
     ['bold', 'italic', 'underline'],
     ['subscript', 'superscript'],
     ['code', 'blockquote'],
@@ -254,6 +258,15 @@ export class EditorComponent implements OnInit, OnDestroy{
   hoveredRow = 0;
   hoveredCol = 0;
 
+  constructor(
+    private commentService: CommentService,
+    private trackChangesService: TrackChangesService
+  ) { }
+
+  addComment(): void {
+    this.commentService.triggerAddComment();
+  }
+
   ngOnInit(): void {
     this.schema = tableSchema;
 
@@ -271,8 +284,62 @@ export class EditorComponent implements OnInit, OnDestroy{
           'Shift-Tab': goToNextCell(-1),
         }),
         keymap(baseKeymap),
+        trackChangesPlugin(this.schema, this.trackChangesService),
       ],
     });
+
+    this.trackChangesService.acceptChange$.subscribe((id: string) => this.handleAcceptChange(id));
+    this.trackChangesService.rejectChange$.subscribe((id: string) => this.handleRejectChange(id));
+  }
+
+  private handleAcceptChange(id: string): void {
+    const { state, dispatch } = this.editor.view;
+    const tr = state.tr;
+    let modified = false;
+
+    state.doc.descendants((node, pos) => {
+      if (node.isText) {
+        node.marks.forEach(mark => {
+          if (mark.type.name === 'insertion' && mark.attrs['id'] === id) {
+            tr.removeMark(pos, pos + node.nodeSize, mark.type);
+            modified = true;
+          } else if (mark.type.name === 'deletion' && mark.attrs['id'] === id) {
+            tr.delete(pos, pos + node.nodeSize);
+            modified = true;
+          }
+        });
+      }
+    });
+
+    if (modified) {
+      dispatch(tr.setMeta('track-changes-skip', true));
+      this.editor.view.focus();
+    }
+  }
+
+  private handleRejectChange(id: string): void {
+    const { state, dispatch } = this.editor.view;
+    const tr = state.tr;
+    let modified = false;
+
+    state.doc.descendants((node, pos) => {
+      if (node.isText) {
+        node.marks.forEach(mark => {
+          if (mark.type.name === 'insertion' && mark.attrs['id'] === id) {
+            tr.delete(pos, pos + node.nodeSize);
+            modified = true;
+          } else if (mark.type.name === 'deletion' && mark.attrs['id'] === id) {
+            tr.removeMark(pos, pos + node.nodeSize, mark.type);
+            modified = true;
+          }
+        });
+      }
+    });
+
+    if (modified) {
+      dispatch(tr.setMeta('track-changes-skip', true));
+      this.editor.view.focus();
+    }
   }
 
   ngOnDestroy(): void {
@@ -280,7 +347,7 @@ export class EditorComponent implements OnInit, OnDestroy{
   }
 
   /** ---------- Table dropdown methods ---------- */
-  
+
   toggleTableDropdown(): void {
     this.showTableDropdown = !this.showTableDropdown;
   }
@@ -308,10 +375,8 @@ export class EditorComponent implements OnInit, OnDestroy{
     return `${this.hoveredRow} × ${this.hoveredCol}`;
   }
 
-  /** ---------- Table commands ---------- */
-
   insertTable(rows = 3, cols = 3, withHeaderRow = true): void {
-    const state = this.editor.view.state;
+    const { state } = this.editor.view;
     const view = this.editor.view;
     const table = this.buildTable(this.schema, rows, cols, withHeaderRow);
     const tr = state.tr.replaceSelectionWith(table).scrollIntoView();
@@ -320,52 +385,45 @@ export class EditorComponent implements OnInit, OnDestroy{
   }
 
   addRowAfter(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    addRowAfter(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    addRowAfter(state, dispatch);
+    this.editor.view.focus();
   }
 
   addColumnAfter(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    addColumnAfter(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    addColumnAfter(state, dispatch);
+    this.editor.view.focus();
   }
 
   deleteRow(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    pmDeleteRow(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    pmDeleteRow(state, dispatch);
+    this.editor.view.focus();
   }
 
   deleteColumn(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    pmDeleteColumn(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    pmDeleteColumn(state, dispatch);
+    this.editor.view.focus();
   }
 
   deleteTable(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    pmDeleteTable(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    pmDeleteTable(state, dispatch);
+    this.editor.view.focus();
   }
 
   mergeCells(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    pmMergeCells(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    pmMergeCells(state, dispatch);
+    this.editor.view.focus();
   }
 
   splitCell(): void {
-    const state = this.editor.view.state;
-    const view = this.editor.view;
-    pmSplitCell(state, view.dispatch);
-    view.focus();
+    const { state, dispatch } = this.editor.view;
+    pmSplitCell(state, dispatch);
+    this.editor.view.focus();
   }
 
   /** Build a PM table node (optionally with a header row) */

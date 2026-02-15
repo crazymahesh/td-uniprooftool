@@ -124,10 +124,10 @@
 
         <!-- Writing Canvas -->
         <app-editor-component></app-editor-component>
-                
-                
-                
-          
+
+
+
+
     </div>
 
     <!-- Right Sidebar (Comments & Track Changes) -->
@@ -162,8 +162,19 @@
                             class="badge bg-secondary rounded-pill ms-1">2</span></h6>
                     <button
                         class="btn btn-primary btn-sm rounded-circle shadow-sm p-0 d-flex align-items-center justify-content-center"
-                        style="width: 24px; height: 24px;" title="New Comment"><i class="fas fa-plus"
-                            style="font-size: 12px;"></i></button>
+                        style="width: 24px; height: 24px;" title="New Comment" (click)="toggleAddComment()"><i
+                            class="fas fa-plus" style="font-size: 12px;"></i></button>
+                </div>
+
+                <!-- New Comment Form -->
+                <div *ngIf="showNewCommentForm" class="mb-3 bg-white p-2 rounded border shadow-sm">
+                    <textarea class="form-control form-control-sm mb-2" rows="3" placeholder="Add a comment..."
+                        [(ngModel)]="newCommentText"></textarea>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-light btn-sm" (click)="cancelComment()">Cancel</button>
+                        <button class="btn btn-primary btn-sm" [disabled]="!newCommentText.trim()"
+                            (click)="postComment()">Post</button>
+                    </div>
                 </div>
 
                 <!-- Filters -->
@@ -216,7 +227,7 @@
             <div class="tab-pane fade" id="changes" role="tabpanel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h6 class="fw-bold text-muted text-uppercase small mb-0">Track Changes</h6>
-                    <span class="badge bg-secondary rounded-pill">2</span>
+                    <span class="badge bg-secondary rounded-pill">{{ trackedChanges.length }}</span>
                 </div>
 
                 <!-- Filters Row 1 -->
@@ -241,33 +252,30 @@
                     </div>
                 </div>
 
-                <!-- Filters Row 2 -->
-                <div class="mb-3 bg-light p-2 rounded border-bottom">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tcFilter" id="tcAll" value="all" checked
-                            style="transform: scale(0.8);">
-                        <label class="form-check-label small" for="tcAll">All</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tcFilter" id="tcPara" value="paragraph"
-                            style="transform: scale(0.8);">
-                        <label class="form-check-label small" for="tcPara">Paragraph</label>
-                    </div>
-                </div>
+                <div class="mb-3"></div>
                 <div class="list-group list-group-flush">
-                    <div class="list-group-item bg-transparent px-0">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1 small fw-bold text-success">Added Text</h6>
-                            <small class="text-muted">Just now</small>
-                        </div>
-                        <p class="mb-1 small fst-italic">"flash of lightning"</p>
+                    <div *ngIf="trackedChanges.length === 0" class="text-center text-muted py-4 small">
+                        No changes tracked yet.
                     </div>
-                    <div class="list-group-item bg-transparent px-0">
+                    <div *ngFor="let change of trackedChanges"
+                        class="list-group-item bg-transparent px-0 border-bottom">
                         <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1 small fw-bold text-danger">Deleted Text</h6>
-                            <small class="text-muted">5 mins ago</small>
+                            <h6 class="mb-1 small fw-bold"
+                                [ngClass]="change.type === 'insert' ? 'text-success' : 'text-danger'">
+                                {{ change.type === 'insert' ? 'Added Text' : 'Deleted Text' }}
+                            </h6>
+                            <small class="text-muted">{{ change.timestamp | date:'shortTime' }}</small>
                         </div>
-                        <p class="mb-1 small text-decoration-line-through text-muted">"darkness"</p>
+                        <p class="mb-1 small"
+                            [ngClass]="{'fst-italic': change.type === 'insert', 'text-decoration-line-through text-muted': change.type === 'delete'}">
+                            "{{ change.content }}"
+                        </p>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-outline-success py-0 px-2" style="font-size: 0.7rem;"
+                                (click)="acceptChange(change.id)">Accept</button>
+                            <button class="btn btn-outline-danger py-0 px-2" style="font-size: 0.7rem;"
+                                (click)="rejectChange(change.id)">Reject</button>
+                        </div>
                     </div>
                 </div>
             </div>
