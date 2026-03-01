@@ -30,6 +30,11 @@
                 "glob": "**/*",
                 "input": "public/img",
                 "output": "/img"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/mock",
+                "output": "/mock"
               }
             ],
             "styles": [

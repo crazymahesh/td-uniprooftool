@@ -12,7 +12,7 @@
         <div class="d-flex align-items-center ms-auto">
             <span class="text-secondary me-3 small"><i class="fas fa-check-circle me-1"></i> Saved</span>
             <button class="btn btn-outline-primary btn-sm me-2">Save</button>
-            <button class="btn btn-primary btn-sm me-2 fw-bold">Submit</button>
+            <button class="btn btn-primary btn-sm me-2 fw-bold" (click)="submitDocument()" title="Convert HTML to JATS XML and download">Submit</button>
             <button class="btn btn-outline-primary btn-sm me-2">Preview</button>
             <div class="ms-3 text-end">
                 <div class="d-inline-block text-end">
@@ -49,30 +49,31 @@
         <div class="tab-content p-3 flex-grow-1 overflow-auto" id="leftSidebarTabContent">
             <!-- Figures Tab -->
             <div class="tab-pane fade show active" id="figures" role="tabpanel">
-                <h6 class="fw-bold text-muted text-uppercase small mb-3">Figures</h6>
-                <div class="tree-view">
-                    <div class="mb-2">
-                        <div class="fw-bold small"><i class="fas fa-folder-open me-2 text-warning"></i>Figure</div>
-                        <ul class="list-unstyled ms-4 small mt-1">
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.1</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.2</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.3</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.4</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.5</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.6</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.7</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.8</a></li>
-                            <li><a href="#" class="text-decoration-none text-dark d-block py-1"><i
-                                        class="fas fa-image me-2 text-muted"></i>Fig 5.9</a></li>
-                        </ul>
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">Figures ({{ figures.length }})</h6>
+                
+                <div *ngIf="figures.length === 0" class="text-center text-muted py-5">
+                    <i class="fas fa-image fa-3x mb-3 opacity-25"></i>
+                    <p class="small">No figures found</p>
+                </div>
+
+                <div *ngIf="figures.length > 0" class="figures-list">
+                    <div *ngFor="let figure of figures" class="figure-item small mb-2 p-2 border rounded cursor-pointer" 
+                        (click)="navigateToFigure(figure.id)" 
+                        style="cursor: pointer; transition: all 0.2s;" 
+                        onmouseover="this.style.backgroundColor='#f0f0f0'; this.style.borderColor='#0056b3';"
+                        onmouseout="this.style.backgroundColor=''; this.style.borderColor='';">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-image me-2 text-muted flex-shrink-0 mt-1"></i>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <div class="fw-bold text-dark" [title]="figure.label">{{ figure.label }}</div>
+                                <div class="text-muted small" *ngIf="figure.caption" 
+                                    style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                    [title]="figure.caption">
+                                    {{ figure.caption }}
+                                </div>
+                                <div class="text-muted small" *ngIf="figure.version">v{{ figure.version }}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -80,9 +81,80 @@
             <!-- Search Tab -->
             <div class="tab-pane fade" id="search" role="tabpanel">
                 <h6 class="fw-bold text-muted text-uppercase small mb-3">Search</h6>
+                
+                <!-- Search Input -->
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control form-control-sm" placeholder="Search document...">
-                    <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-search"></i></button>
+                    <input type="text" 
+                        class="form-control form-control-sm" 
+                        placeholder="Enter text to search..." 
+                        [(ngModel)]="searchText"
+                        (input)="onSearchInputChange()"
+                        (keyup.enter)="performSearch()">
+                    <button class="btn btn-primary btn-sm" (click)="performSearch()" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" (click)="clearSearch()" title="Clear">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Search Filters -->
+                <div class="search-filters small mb-3 p-2 bg-light rounded border">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="matchCase" 
+                            [(ngModel)]="searchFilters.matchCase">
+                        <label class="form-check-label" for="matchCase">
+                            Match case
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="wholeWord" 
+                            [(ngModel)]="searchFilters.wholeWord">
+                        <label class="form-check-label" for="wholeWord">
+                            Whole word
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div *ngIf="searchText && searchResults.length > 0" class="search-results">
+                    <div class="small text-muted mb-2">
+                        Found {{ searchResults.length }} result(s)
+                    </div>
+                    
+                    <div *ngFor="let result of searchResults; let i = index" 
+                        class="search-result-item small mb-2 p-2 border rounded cursor-pointer"
+                        [class.active]="i === selectedResultIndex"
+                        (click)="navigateToSearchResult(i)"
+                        style="cursor: pointer;">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-file-text me-2 text-muted flex-shrink-0 mt-1"></i>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <div class="fw-bold text-dark text-truncate" [title]="result.text">
+                                    "{{ result.text }}"
+                                </div>
+                                <div class="text-muted small text-truncate" [title]="result.context">
+                                    {{ result.context }}
+                                </div>
+                                <div class="text-muted extra-small">
+                                    Result {{ i + 1 }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Results Message -->
+                <div *ngIf="searchText && searchResults.length === 0" class="text-center text-muted py-5">
+                    <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                    <p class="small">No matches found</p>
+                    <p class="extra-small">Try adjusting your search or filters</p>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="!searchText" class="text-center text-muted py-5">
+                    <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                    <p class="small">Enter search text above</p>
                 </div>
             </div>
 
@@ -123,7 +195,7 @@
         </div> -->
 
         <!-- Writing Canvas -->
-        <app-editor-component></app-editor-component>
+        <app-editor-component (figuresExtracted)="onFiguresExtracted($event)"></app-editor-component>
 
 
 
@@ -146,11 +218,7 @@
                         data-bs-target="#comments" type="button" role="tab" title="Comments" href="#comments"><i
                             class="fas fa-comment-alt"></i></a>
                 </li>
-                <li class="nav-item border-end" role="presentation">
-                    <a class="nav-link py-1 px-2 rounded-0" id="changes-tab" data-bs-toggle="tab"
-                        data-bs-target="#changes" type="button" role="tab" title="Track Changes" href="#changes"><i
-                            class="fas fa-history"></i></a>
-                </li>
+
             </ul>
         </div>
 
@@ -223,62 +291,7 @@
                 </div>
             </div>
 
-            <!-- Track Changes Tab -->
-            <div class="tab-pane fade" id="changes" role="tabpanel">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold text-muted text-uppercase small mb-0">Track Changes</h6>
-                    <span class="badge bg-secondary rounded-pill">{{ trackedChanges.length }}</span>
-                </div>
 
-                <!-- Filters Row 1 -->
-                <div class="d-flex justify-content-between mb-2 pb-2 border-bottom">
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" style="padding: 0.1rem 0.5rem; font-size: 0.75rem;">
-                            Users: All
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">All</a></li>
-                        </ul>
-                    </div>
-                    <div class="dropdown">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" style="padding: 0.1rem 0.5rem; font-size: 0.75rem;">
-                            View: All
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">All</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="mb-3"></div>
-                <div class="list-group list-group-flush">
-                    <div *ngIf="trackedChanges.length === 0" class="text-center text-muted py-4 small">
-                        No changes tracked yet.
-                    </div>
-                    <div *ngFor="let change of trackedChanges"
-                        class="list-group-item bg-transparent px-0 border-bottom">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h6 class="mb-1 small fw-bold"
-                                [ngClass]="change.type === 'insert' ? 'text-success' : 'text-danger'">
-                                {{ change.type === 'insert' ? 'Added Text' : 'Deleted Text' }}
-                            </h6>
-                            <small class="text-muted">{{ change.timestamp | date:'shortTime' }}</small>
-                        </div>
-                        <p class="mb-1 small"
-                            [ngClass]="{'fst-italic': change.type === 'insert', 'text-decoration-line-through text-muted': change.type === 'delete'}">
-                            "{{ change.content }}"
-                        </p>
-                        <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-outline-success py-0 px-2" style="font-size: 0.7rem;"
-                                (click)="acceptChange(change.id)">Accept</button>
-                            <button class="btn btn-outline-danger py-0 px-2" style="font-size: 0.7rem;"
-                                (click)="rejectChange(change.id)">Reject</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

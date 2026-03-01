@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.2 20090126//EN" "JATS-journalpublishing1.dtd">
+<article xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" dtd-version="1.2" article-type="research-article">
+  <front>
+    <article-meta>
+      <title-group>
+        <article-title>Neural Networks and Deep Learning: An Introduction</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>Smith</surname>
+            <given-names>John</given-names>
+          </name>
+        </contrib>
+      </contrib-group>
+      <abstract>
+        <p>This article provides a comprehensive introduction to neural networks and deep learning. We explore the fundamental concepts, architectures, and applications of these transformative technologies.</p>
+      </abstract>
+    </article-meta>
+  </front>
+  <body>
+    <sec id="sec1">
+      <title>Chapter 1: The Beginning</title>
+      <sec id="sec1-1">
+        <title>1.1 Introduction to Neural Networks</title>
+        <p>Neural networks are a subset of machine learning and are at the heart of deep learning algorithms. Their name and structure are inspired by the human brain, mimicking the way that biological neurons signal to one another.</p>
+        <p>Artificial neural networks (ANNs) are comprised of node layers, containing an input layer, one or more hidden layers, and an output layer. Each node, or artificial neuron, connects to another and has an associated weight and threshold.</p>
+        
+        <sec id="sec1-1-1">
+          <title>Key Components</title>
+          <list list-type="bullet">
+            <list-item>
+              <p><bold>Input Layer:</bold> Receives initial data for the neural network.</p>
+            </list-item>
+            <list-item>
+              <p><bold>Hidden Layers:</bold> Intermediate layers where data processing happens.</p>
+            </list-item>
+            <list-item>
+              <p><bold>Output Layer:</bold> Produces the final result for given inputs.</p>
+            </list-item>
+            <list-item>
+              <p><bold>Weights and Biases:</bold> Parameters that are adjusted during training.</p>
+            </list-item>
+          </list>
+        </sec>
+        
+        <sec id="sec1-1-2">
+          <title>Training Process</title>
+          <list list-type="order">
+            <list-item>
+              <p><bold>Forward Propagation:</bold> Data flows through the network to get an output.</p>
+            </list-item>
+            <list-item>
+              <p><bold>Loss Calculation:</bold> The difference between predicted and actual output is calculated.</p>
+            </list-item>
+            <list-item>
+              <p><bold>Backpropagation:</bold> The error is propagated back through the network to update weights.</p>
+            </list-item>
+            <list-item>
+              <p><bold>Iteration:</bold> Steps 1-3 are repeated until the model converges.</p>
+            </list-item>
+          </list>
+        </sec>
+        
+        <sec id="sec1-1-3">
+          <title>Performance Comparison</title>
+          <p>The following table helps to visualize the performance differences between various activation functions used in neural networks.</p>
+          <table-wrap>
+            <table>
+              <thead>
+                <tr>
+                  <th>Activation Function</th>
+                  <th>Range</th>
+                  <th>Smoothness</th>
+                  <th>Computational Cost</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Sigmoid</td>
+                  <td>(0, 1)</td>
+                  <td>Smooth</td>
+                  <td>High</td>
+                </tr>
+                <tr>
+                  <td>Tanh</td>
+                  <td>(-1, 1)</td>
+                  <td>Smooth</td>
+                  <td>High</td>
+                </tr>
+                <tr>
+                  <td>ReLU (Rectified Linear Unit)</td>
+                  <td>[0, infinity)</td>
+                  <td>Not smooth at 0</td>
+                  <td>Low</td>
+                </tr>
+              </tbody>
+            </table>
+          </table-wrap>
+        </sec>
+      </sec>
+      
+      <sec id="sec1-2">
+        <title>1.2 Convolutional Neural Networks (CNNs)</title>
+        <p>Convolutional Neural Networks, or <italic>CNNs</italic>, are a specialized type of neural network designed to process data that has a known grid-like topology, such as time-series data and image data.</p>
+      </sec>
+    </sec>
+    
+    <sec id="sec2">
+      <title>References</title>
+      <ref-list>
+        <ref id="ref1">
+          <element-citation publication-type="journal">
+            <person-group person-group-type="author">
+              <name>
+                <surname>LeCun</surname>
+                <given-names>Y</given-names>
+              </name>
+              <name>
+                <surname>Bengio</surname>
+                <given-names>Y</given-names>
+              </name>
+              <name>
+                <surname>Hinton</surname>
+                <given-names>G</given-names>
+              </name>
+            </person-group>
+            <year>2015</year>
+            <article-title>Deep learning</article-title>
+            <source>Nature</source>
+            <volume>521</volume>
+            <fpage>436</fpage>
+            <lpage>444</lpage>
+          </element-citation>
+        </ref>
+      </ref-list>
+    </sec>
+  </body>
+</article>

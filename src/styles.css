@@ -27,13 +27,13 @@ body {
 
 /* Exclude editor content from Gotham Book */
 .writing-area {
-    font-family: 'Inter', sans-serif !important;
-    font-size: 1rem !important;
+    font-family: 'Gotham Book', 'Inter', sans-serif !important;
+    font-size: 0.85rem !important;
     line-height: 1.5 !important;
 }
 .writing-area,
 .editor-main {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Gotham Book', 'Inter', sans-serif;
     /* Keep original font or system default for editing */
 }
 

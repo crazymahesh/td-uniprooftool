@@ -9,3 +9,68 @@
  .navbar {
      z-index: 1040;
  }
+
+ /* Figure Highlight */
+ .figure-highlight {
+   animation: highlightPulse 0.5s ease-in-out 2;
+   background-color: rgba(255, 193, 7, 0.3) !important;
+   border: 2px solid #ffc107 !important;
+ }
+
+ @keyframes highlightPulse {
+   0%, 100% {
+     background-color: rgba(255, 193, 7, 0.3);
+   }
+   50% {
+     background-color: rgba(255, 193, 7, 0.6);
+   }
+ }
+
+ /* Search Highlight */
+ .search-highlight {
+   background-color: #ffeb3b;
+   color: #000;
+   font-weight: bold;
+   padding: 0 2px;
+   border-radius: 2px;
+ }
+
+ /* Search Results */
+ .search-filters {
+   border-color: #dee2e6 !important;
+ }
+
+ .search-filters .form-check {
+   margin-bottom: 0.5rem;
+ }
+
+ .search-filters .form-check:last-child {
+   margin-bottom: 0;
+ }
+
+ .search-results {
+   max-height: 400px;
+   overflow-y: auto;
+ }
+
+ .search-result-item {
+   border-color: #dee2e6 !important;
+   transition: all 0.2s;
+ }
+
+ .search-result-item:hover {
+   background-color: #f0f0f0;
+   border-color: #0056b3 !important;
+   box-shadow: 0 2px 4px rgba(0, 86, 179, 0.1);
+ }
+
+ .search-result-item.active {
+   background-color: #e7f3ff;
+   border-color: #0056b3 !important;
+   box-shadow: inset 0 0 0 2px rgba(0, 86, 179, 0.2);
+ }
+
+ .extra-small {
+   font-size: 0.7rem;
+   margin-top: 0.2rem;
+ }

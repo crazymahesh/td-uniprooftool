@@ -3,6 +3,7 @@
     border:none !important;
     box-shadow:none !important;
 }
+
 /* Table Dropdown Styles */
 .table-dropdown-wrapper {
   position: relative;
@@ -215,3 +216,260 @@ ngx-editor.resize-cursor,
     
     color:#000 !important;
 }
+/* ========== JATS HTML Content Styling ========== */
+
+/* Typography and Spacing Classes */
+.custom-editor h1,
+.custom-editor h2,
+.custom-editor h3,
+.custom-editor h4,
+.custom-editor h5,
+.custom-editor h6,
+ngx-editor h1,
+ngx-editor h2,
+ngx-editor h3,
+ngx-editor h4,
+ngx-editor h5,
+ngx-editor h6,
+.ProseMirror h1,
+.ProseMirror h2,
+.ProseMirror h3,
+.ProseMirror h4,
+.ProseMirror h5,
+.ProseMirror h6 {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.custom-editor h1,
+ngx-editor h1,
+.ProseMirror h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.custom-editor h2,
+ngx-editor h2,
+.ProseMirror h2 {
+  font-size: 1.5rem;
+}
+
+.custom-editor .mb-3,
+ngx-editor .mb-3,
+.ProseMirror .mb-3,
+.custom-editor .mb-4,
+ngx-editor .mb-4,
+.ProseMirror .mb-4 {
+  margin-bottom: 1rem !important;
+}
+
+.custom-editor .my-4,
+ngx-editor .my-4,
+.ProseMirror .my-4 {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.custom-editor .fw-bold,
+ngx-editor .fw-bold,
+.ProseMirror .fw-bold {
+  font-weight: 700 !important;
+}
+
+.custom-editor .lead,
+ngx-editor .lead,
+.ProseMirror .lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+}
+
+.custom-editor .text-muted,
+ngx-editor .text-muted,
+.ProseMirror .text-muted {
+  color: #6c757d !important;
+}
+
+/* Alert and Info Boxes */
+.custom-editor .alert,
+ngx-editor .alert,
+.ProseMirror .alert,
+.preview .alert {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.custom-editor .alert-info,
+ngx-editor .alert-info,
+.ProseMirror .alert-info,
+.preview .alert-info {
+  color: #084298;
+  background-color: #cfe2ff;
+  border-color: #b6d4fe;
+}
+
+/* Section Styling */
+.custom-editor section,
+ngx-editor section,
+.ProseMirror section {
+  display: block;
+  margin: 1.5rem 0;
+}
+
+/* Figure and Image Styling */
+.custom-editor figure,
+ngx-editor figure,
+.ProseMirror figure,
+.preview figure {
+  border: 1px solid #dee2e6;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.custom-editor figure.figure,
+ngx-editor figure.figure,
+.ProseMirror figure.figure,
+.preview figure.figure {
+  border: 1px solid #dee2e6 !important;
+  padding: 1rem !important;
+  background-color: #f8f9fa !important;
+  margin: 1.5rem 0 !important;
+}
+
+/* Figure Images */
+.custom-editor figure img,
+.custom-editor figure .figure-img,
+ngx-editor figure img,
+ngx-editor figure .figure-img,
+.ProseMirror figure img,
+.ProseMirror figure .figure-img,
+.preview figure img,
+.preview figure .figure-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.custom-editor .figure-img.img-fluid,
+ngx-editor .figure-img.img-fluid,
+.ProseMirror .figure-img.img-fluid,
+.preview .figure-img.img-fluid {
+  width: 100%;
+  max-height: 400px;
+}
+
+.custom-editor .figure-img.rounded,
+ngx-editor .figure-img.rounded,
+.ProseMirror .figure-img.rounded,
+.preview .figure-img.rounded {
+  border-radius: 0.5rem;
+}
+
+/* Figure Caption and Label */
+.custom-editor figcaption,
+.custom-editor .figure-caption,
+.custom-editor figure caption,
+ngx-editor figcaption,
+ngx-editor .figure-caption,
+ngx-editor figure caption,
+.ProseMirror figcaption,
+.ProseMirror .figure-caption,
+.ProseMirror figure caption,
+.preview figcaption,
+.preview .figure-caption,
+.preview figure caption {
+  font-size: 0.875rem;
+  color: #495057;
+  margin-top: 0.75rem;
+  padding: 0 0.5rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* Figure Label (before caption text) */
+.custom-editor figure label,
+ngx-editor figure label,
+.ProseMirror figure label,
+.preview figure label {
+  display: block;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Graphic/Image within Figure */
+.custom-editor figure graphic,
+.custom-editor figure .graphic,
+ngx-editor figure graphic,
+ngx-editor figure .graphic,
+.ProseMirror figure graphic,
+.ProseMirror figure .graphic,
+.preview figure graphic,
+.preview figure .graphic {
+  display: inline-block;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* Display Quote inside Figure (often used for captions) */
+.custom-editor figure disp-quote,
+.custom-editor figure .disp-quote,
+ngx-editor figure disp-quote,
+ngx-editor figure .disp-quote,
+.ProseMirror figure disp-quote,
+.ProseMirror figure .disp-quote,
+.preview figure disp-quote,
+.preview figure .disp-quote {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #495057;
+  border-left: 3px solid #dee2e6;
+  padding-left: 0.75rem;
+  font-style: italic;
+}
+
+/* Figure Container with Multiple Elements */
+.custom-editor figure > div,
+ngx-editor figure > div,
+.ProseMirror figure > div,
+.preview figure > div {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Block Quotes */
+.custom-editor blockquote,
+ngx-editor blockquote,
+.ProseMirror blockquote {
+  border-left: 4px solid #dee2e6;
+  padding-left: 1rem;
+  margin: 1rem 0;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Paragraph Styling */
+.custom-editor p,
+ngx-editor p,
+.ProseMirror p {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+

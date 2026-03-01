@@ -29,7 +29,61 @@ const tables = tableNodes({
   },
 });
 
-const nodes = ngxSchema.spec.nodes.append(tables);
+// Add figure and figcaption nodes to support figure elements
+const figureNodes: Record<string, any> = {
+  figure: {
+    content: 'block*',
+    group: 'block',
+    draggable: true,
+    selectable: true,
+    attrs: {
+      id: { default: null },
+      'data-id': { default: null },
+      class: { default: 'figure border p-2 bg-light w-100 text-center mb-4' },
+    },
+    parseDOM: [
+      {
+        tag: 'figure',
+        getAttrs: (dom: HTMLElement) => ({
+          id: dom.getAttribute('id'),
+          'data-id': dom.getAttribute('data-id'),
+          class: dom.getAttribute('class'),
+        }),
+      },
+    ],
+    toDOM(node: any): [string, Record<string, any>, number] {
+      const attrs: Record<string, any> = {
+        class: node.attrs.class || 'figure border p-2 bg-light w-100 text-center mb-4',
+      };
+      if (node.attrs['id']) attrs['id'] = node.attrs['id'];
+      if (node.attrs['data-id']) attrs['data-id'] = node.attrs['data-id'];
+      return ['figure', attrs, 0];
+    },
+  },
+  figcaption: {
+    content: 'block*',
+    attrs: {
+      class: { default: 'figure-caption' },
+    },
+    parseDOM: [
+      {
+        tag: 'figcaption',
+        getAttrs: (dom: HTMLElement) => ({
+          class: dom.getAttribute('class'),
+        }),
+      },
+    ],
+    toDOM(node: any): [string, Record<string, any>, number] {
+      return [
+        'figcaption',
+        { class: node.attrs.class || 'figure-caption' },
+        0,
+      ];
+    },
+  },
+};
+
+const nodes = ngxSchema.spec.nodes.append(figureNodes).append(tables);
 
 export const tableSchema = new Schema({
   nodes,
