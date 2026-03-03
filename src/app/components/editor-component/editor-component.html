@@ -7,6 +7,11 @@
         <i class="fas fa-comment-medical"></i>
     </button>
 
+    <!-- Insert Citation Button -->
+    <button type="button" class="btn btn-sm btn-light" (click)="openCitationModal()" title="Insert Citation">
+        <i class="fas fa-quote-right"></i>
+    </button>
+
     <div class="table-dropdown-wrapper" (mouseleave)="closeTableDropdown()">
         <button type="button" class="btn btn-sm btn-light table-icon-btn" (click)="showTableDropdown = true"
             title="Table">
@@ -65,6 +70,40 @@
         </div>
     </div>
 </div>
+
+<!-- Citation Modal Dialog -->
+<div class="modal fade" id="citationModal" [class.show]="showCitationModal" [style.display]="showCitationModal ? 'block' : 'none'" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Insert Citation</h5>
+                <button type="button" class="btn-close" (click)="closeCitationModal()" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="citationId" class="form-label">Citation ID</label>
+                    <input type="text" class="form-control" id="citationId" [(ngModel)]="citationForm.id" 
+                        placeholder="e.g., smith2023" />
+                </div>
+                <div class="mb-3">
+                    <label for="citationLabel" class="form-label">Citation Label (Display Text)</label>
+                    <input type="text" class="form-control" id="citationLabel" [(ngModel)]="citationForm.label" 
+                        placeholder="e.g., Smith et al., 2023" />
+                </div>
+                <div class="alert alert-info" *ngIf="selectedCitationText">
+                    <small><strong>Selected text:</strong> "{{ selectedCitationText }}"</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="closeCitationModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" (click)="insertCitation()">Insert Citation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade" *ngIf="showCitationModal" [class.show]="showCitationModal"></div>
 
 <div class="editor-main container-fluid px-3 py-3" style="height: calc(100vh - 130px - 40px); overflow-y: auto;">
     <div class="writing-area">

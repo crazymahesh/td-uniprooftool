@@ -7,7 +7,8 @@ import { jatsToHtmlMaster } from '../../utils/jats-to-html';
 import { ArticleService } from '../../services/article.service';
 import { FigureMetadata, extractFiguresFromXml } from './figure.model';
 // 🔹 Table schema & PM plugins
-import { Schema, Node as PMNode, Fragment, DOMSerializer } from 'prosemirror-model';
+import { Schema, Node as PMNode, Fragment, DOMSerializer, Mark } from 'prosemirror-model';
+import { EditorState, Transaction } from 'prosemirror-state';
 import { keymap } from 'prosemirror-keymap';
 import { baseKeymap } from 'prosemirror-commands';
 import {
@@ -24,6 +25,7 @@ import {
 } from 'prosemirror-tables';
 
 import { tableSchema } from './editor-schema';
+import { imageSelectionPlugin } from './image-selection-plugin';
 
 @Component({
   selector: 'app-editor-component',
@@ -137,7 +139,10 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
   gridCols = 10;
   hoveredRow = 0;
   hoveredCol = 0;
-
+  // Citation modal state
+  showCitationModal = false;
+  citationForm = { id: '', label: '' };
+  selectedCitationText = '';
   // Emit figures to parent component
   @Output() figuresExtracted = new EventEmitter<FigureMetadata[]>();
 
@@ -153,9 +158,63 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * Get the current HTML content from the ProseMirror editor state
-   * This captures all edits made by the user
+   * Open citation modal and capture selected text
    */
+  openCitationModal(): void {
+    const { selection } = this.editor.view.state;
+    const { from, to } = selection;
+    
+    if (from !== to) {
+      // Get the selected text
+      const selectedNode = this.editor.view.state.doc.textBetween(from, to);
+      this.selectedCitationText = selectedNode;
+      this.citationForm.label = selectedNode; // Pre-fill label with selected text
+    } else {
+      this.selectedCitationText = '';
+      this.citationForm.label = '';
+    }
+    
+    this.showCitationModal = true;
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Close citation modal and reset form
+   */
+  closeCitationModal(): void {
+    this.showCitationModal = false;
+    this.citationForm = { id: '', label: '' };
+    this.selectedCitationText = '';
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Insert citation mark at current selection or around selected text
+   */
+  insertCitation(): void {
+    if (!this.citationForm.id || !this.citationForm.label) {
+      alert('Please fill in both Citation ID and Label');
+      return;
+    }
+
+    const { state, dispatch } = this.editor.view;
+    const { selection, schema } = state;
+    const { from, to } = selection;
+    const citationMark = schema.marks['citation'].create({
+      id: this.citationForm.id,
+      label: this.citationForm.label
+    });
+
+    // Apply the citation mark to the selection
+    let tr = state.tr.addMark(from, to, citationMark);
+
+    // Dispatch the transaction
+    dispatch(tr);
+
+    // Close the modal and reset
+    this.closeCitationModal();
+    this.editor.view.focus();
+  }
   getUpdatedHtmlContent(): string {
     if (!this.editor || !this.editor.view) {
       console.warn('Editor not initialized');
@@ -193,6 +252,7 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
           'Shift-Tab': goToNextCell(-1),
         }),
         keymap(baseKeymap),
+        imageSelectionPlugin(),
       ],
     });
   }

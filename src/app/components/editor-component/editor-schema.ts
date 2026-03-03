@@ -97,6 +97,49 @@ export const tableSchema = new Schema({
       attrs: { id: { default: null } },
       parseDOM: [{ tag: 'span.deletion', getAttrs: (dom: any) => ({ id: dom.getAttribute('data-id') }) }],
       toDOM(mark) { return ['span', { class: 'deletion', 'data-id': mark.attrs['id'], style: 'color: red; text-decoration: line-through;' }, 0]; }
+    },
+    citation: {
+      attrs: { 
+        id: { default: null },
+        label: { default: '' }
+      },
+      parseDOM: [
+        { 
+          tag: 'span.citation', 
+          getAttrs: (dom: any) => ({ 
+            id: dom.getAttribute('data-citation-id'),
+            label: dom.getAttribute('data-label') || dom.textContent
+          }) 
+        }
+      ],
+      toDOM(mark) { 
+        return ['span', { 
+          class: 'citation', 
+          'data-citation-id': mark.attrs['id'] || '',
+          'data-label': mark.attrs['label'] || '',
+          title: `Citation: ${mark.attrs['label'] || mark.attrs['id'] || ''}`
+        }, 0]; 
+      }
+    },
+    searchHighlight: {
+      attrs: { matchNumber: { default: null } },
+      parseDOM: [
+        { tag: 'span.search-highlight', getAttrs: (dom: any) => ({ matchNumber: dom.getAttribute('data-match-number') }) },
+        { tag: 'span[data-search-highlight]', getAttrs: (dom: any) => ({ matchNumber: dom.getAttribute('data-match-number') }) }
+      ],
+      toDOM(mark) { 
+        return ['span', { class: 'search-highlight', 'data-search-highlight': mark.attrs['matchNumber'] || '' }, 0]; 
+      }
+    },
+    searchHighlightInline: {
+      attrs: { matchNumber: { default: null } },
+      parseDOM: [
+        { tag: 'span.search-highlight-inline', getAttrs: (dom: any) => ({ matchNumber: dom.getAttribute('data-match-number') }) },
+        { tag: 'span[data-search-match]', getAttrs: (dom: any) => ({ matchNumber: dom.getAttribute('data-match-number') }) }
+      ],
+      toDOM(mark) { 
+        return ['span', { class: 'search-highlight-inline', 'data-search-match': mark.attrs['matchNumber'] || '' }, 0]; 
+      }
     }
   }),
 });

@@ -13,7 +13,7 @@
             <span class="text-secondary me-3 small"><i class="fas fa-check-circle me-1"></i> Saved</span>
             <button class="btn btn-outline-primary btn-sm me-2">Save</button>
             <button class="btn btn-primary btn-sm me-2 fw-bold" (click)="submitDocument()" title="Convert HTML to JATS XML and download">Submit</button>
-            <button class="btn btn-outline-primary btn-sm me-2">Preview</button>
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="openPreview()" title="Preview HTML content">Preview</button>
             <div class="ms-3 text-end">
                 <div class="d-inline-block text-end">
                     <div class="fw-bold lh-1" style="font-size: 0.75rem;">mahesh.amirthalingam@xyz.com
@@ -25,12 +25,12 @@
     </div>
 </nav>
 
-<div class="row g-0">
+<div class="row g-0 mainEditor" style="height: calc(100vh - 96px);">
     <!-- Left Sidebar (Insert Actions) -->
     <!-- Left Sidebar (Tabs: Figures, Search, Attachments) -->
-    <div class="col-md-2 bg-light border-end editor-sidebar d-flex flex-column p-0">
+    <div class="col-md-2 bg-light border-end editor-sidebar d-flex flex-column p-0" style="position: relative; z-index: 1000;">
         <!-- Tabs Header -->
-        <ul class="nav nav-tabs nav-fill small" id="leftSidebarTab" role="tablist">
+        <ul class="nav nav-tabs nav-fill small" id="leftSidebarTab" role="tablist" style="position: sticky; top: 0; z-index: 1001;">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active py-2" id="figures-tab" data-bs-toggle="tab" data-bs-target="#figures"
                     type="button" role="tab" title="Figures"><i class="fas fa-image"></i></button>
@@ -203,8 +203,8 @@
     </div>
 
     <!-- Right Sidebar (Comments & Track Changes) -->
-    <div class="col-md-3 bg-light border-start p-0" style="height: calc(100vh - 56px - 40px); overflow-y: auto;">
-        <div class="p-2 border-bottom bg-white sticky-top d-flex justify-content-between align-items-center">
+    <div class="col-md-3 bg-light border-start p-0" style="height: calc(100vh - 96px); overflow-y: auto; position: relative; z-index: 999;">
+        <div class="p-2 border-bottom bg-white sticky-top d-flex justify-content-between align-items-center" style="top: 0; z-index: 1000;">
             <!-- Left Icons -->
             <div class="d-flex">
                 <button class="btn btn-link btn-sm text-secondary" title="Pin"><i class="fas fa-thumbtack"></i></button>

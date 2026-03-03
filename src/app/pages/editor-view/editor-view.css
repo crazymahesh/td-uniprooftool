@@ -5,6 +5,19 @@
      /* Space for footer */
  }
 
+ /* Main editor container */
+ .mainEditor {
+   position: relative;
+   z-index: 1;
+ }
+
+ .editor-sidebar {
+   position: relative;
+   z-index: 1000;
+   max-height: calc(100vh - 96px);
+   overflow-y: auto;
+ }
+
  /* Override default for editor */
  .navbar {
      z-index: 1040;
@@ -28,11 +41,27 @@
 
  /* Search Highlight */
  .search-highlight {
-   background-color: #ffeb3b;
-   color: #000;
-   font-weight: bold;
-   padding: 0 2px;
-   border-radius: 2px;
+   background-color: #ffeb3b !important;
+   color: #000 !important;
+   font-weight: bold !important;
+   padding: 0 4px !important;
+   border-radius: 2px !important;
+   box-shadow: 0 0 8px rgba(255, 235, 59, 0.6) !important;
+ }
+
+ .search-highlight-inline {
+   background-color: #ffeb3b !important;
+   color: #000 !important;
+   font-weight: bold !important;
+   padding: 0 2px !important;
+   border-radius: 2px !important;
+ }
+
+ /* Ensure spans render properly in ProseMirror */
+ .ProseMirror span.search-highlight,
+ .ProseMirror span.search-highlight-inline {
+   display: inline;
+   white-space: nowrap;
  }
 
  /* Search Results */
