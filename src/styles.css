@@ -308,5 +308,7 @@ body {
     font-size: 1.5rem;
     font-weight: 600;
     margin-top: 1.5rem;
-    margin-bottom: 0.75rem;
 }
+
+/* Modal Styling */
+.modal{z-index:1050!important}.modal.show{display:block;padding-right:0!important}.modal-dialog{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;margin:0!important;z-index:1050!important}.modal-backdrop{z-index:1040!important}.modal-backdrop.show{opacity:.5}
