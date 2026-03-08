@@ -6,7 +6,7 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/landing/landing').then(m => m.Landing),
     },
     {
-        path: 'editor',
+        path: 'editor/:documentId',
         loadComponent: () => import('./pages/editor-view/editor-view').then(m => m.EditorView),
     },
 ];

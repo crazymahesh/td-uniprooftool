@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ViewEncapsulation, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
 import { EditorComponent } from '../../components/editor-component/editor-component';
 import { CommentService } from '../../services/comment.service';
 import { FigureMetadata } from '../../components/editor-component/figure.model';
 import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
-import { htmlToJats } from '../../utils/html-to-jats';
+import { ActivatedRoute } from '@angular/router';
+import { LoaderService } from '../../services/loader.service';
+import { CommonServices } from '../../services/common-services';
 
 @Component({
   standalone: true,
@@ -13,13 +15,17 @@ import { htmlToJats } from '../../utils/html-to-jats';
   imports: [CommonModule, EditorComponent, FormsModule],
   templateUrl: './editor-view.html',
   styleUrls: ['./editor-view.css'],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
 })
 export class EditorView implements OnInit, OnDestroy {
   showNewCommentForm = false;
   newCommentText = '';
   figures: FigureMetadata[] = [];
-  
+  saveStatusText = 'Saved';
+  lastSavedAt: Date | null = null;
+  documentId: string | null = null;
+  documentDetails: any = null;
+  private commonServices = inject(CommonServices);
   // Search functionality
   searchText = '';
   searchResults: any[] = [];
@@ -38,13 +44,39 @@ export class EditorView implements OnInit, OnDestroy {
   constructor(
     private commentService: CommentService,
     private ngZone: NgZone,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
     this.subscription.add(
       this.commentService.showCommentForm$.subscribe(() => {
         this.showNewCommentForm = true;
+      })
+    );
+
+    this.subscription.add(
+      this.route.paramMap.subscribe((params) => {
+        const paramDocumentId = params.get('documentId');
+        this.documentId = paramDocumentId;
+
+        if (paramDocumentId) {
+          this.loadDocumentDetails(paramDocumentId);
+        }
+      })
+    );
+  }
+
+  private loadDocumentDetails(documentId: string): void {
+    this.subscription.add(
+      this.commonServices.getDocumentDetails(documentId).subscribe({
+        next: (response: any) => {
+          this.documentDetails = response;
+          console.log('[EditorView] Loaded document details:', this.documentDetails);
+        },
+        error: (error: any) => {
+          console.error('[EditorView] Failed to load document details:', error);
+        }
       })
     );
   }
@@ -74,53 +106,7 @@ export class EditorView implements OnInit, OnDestroy {
     this.showNewCommentForm = false;
   }
 
-  /**
-   * Convert editor content (HTML) to JATS XML and download
-   */
-  submitDocument(): void {
-    if (!this.editorComponent) {
-      console.error('Editor component not found');
-      alert('Error: Editor component not available');
-      return;
-    }
-
-    try {
-      // Get updated HTML content from editor (includes all edits made in ProseMirror)
-      const htmlContent = this.editorComponent.getUpdatedHtmlContent();
-      console.log('HTML content to convert:', htmlContent);
-      
-      if (!htmlContent || htmlContent.trim() === '') {
-        alert('Document is empty. Please add content before submitting.');
-        return;
-      }
-
-      // Convert HTML to JATS XML with ID preservation
-      const jatsXml = htmlToJats(htmlContent);
-
-      console.log('Generated JATS XML with IDs:', jatsXml);
-      console.log('Submitting document with updated content');
-
-      // Extract and log IDs to verify preservation
-      const idMatches = jatsXml.match(/id="([^"]+)"/g);
-      if (idMatches && idMatches.length > 0) {
-        console.log('✓ Preserved IDs:', idMatches.map(id => id.replace(/id="|"/g, '')));
-      } else {
-        console.log('ℹ No IDs found in generated XML');
-      }
-
-      // Download the JATS XML file
-      this.downloadJatsXml(jatsXml);
-
-      // Show success message
-      const message = idMatches && idMatches.length > 0
-        ? `Document converted and downloaded successfully!\n\n✓ Preserved ${idMatches.length} element IDs\n\nCheck your console to verify the generated JATS XML.`
-        : 'Document converted and downloaded successfully!\n\nCheck your console to verify the generated JATS XML.';
-      alert(message);
-    } catch (error) {
-      console.error('Error during document submission:', error);
-      alert('Error converting document. Please check the console for details.');
-    }
-  }
+  
 
   /**
    * Navigate to and highlight a figure in the editor
@@ -579,6 +565,58 @@ export class EditorView implements OnInit, OnDestroy {
     this.removeAllHighlights();
     
     console.log('Search cleared successfully');
+  }
+
+  /**
+   * Convert editor HTML to JATS and persist a local draft copy.
+   */
+  onSave(): void {
+    if (!this.editorComponent) {
+      alert('Editor is not ready yet.');
+      return;
+    }
+
+    try {
+      const jatsXml = this.editorComponent.getUpdatedJatsXml();
+      localStorage.setItem('uniproof-jats-draft', jatsXml);
+      this.lastSavedAt = new Date();
+      this.saveStatusText = 'Saved';
+      console.log('JATS draft saved successfully');
+    } catch (error) {
+      console.error('Error saving JATS draft:', error);
+      this.saveStatusText = 'Save failed';
+      alert('Unable to save JATS XML. Please check console logs.');
+    }
+  }
+
+  /**
+   * Convert editor HTML to JATS and export XML.
+   */
+  onSubmit(): void {
+    if (!this.editorComponent) {
+      alert('Editor is not ready yet.');
+      return;
+    }
+
+    try {
+      const jatsXml = this.editorComponent.getUpdatedJatsXml();
+      this.downloadJatsXml(jatsXml);
+      this.lastSavedAt = new Date();
+      this.saveStatusText = 'Submitted';
+      console.log('JATS XML generated and downloaded successfully');
+    } catch (error) {
+      console.error('Error generating JATS XML:', error);
+      this.saveStatusText = 'Submit failed';
+      alert('Unable to generate JATS XML. Please check console logs.');
+    }
+  }
+
+  getLastSavedLabel(): string {
+    if (!this.lastSavedAt) {
+      return 'Not saved yet';
+    }
+
+    return `Last saved ${this.lastSavedAt.toLocaleTimeString()}`;
   }
 
   /**

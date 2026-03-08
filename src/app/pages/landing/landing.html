@@ -11,7 +11,7 @@
         <div class="d-flex align-items-center ms-auto">
             <div class="ms-3 text-end">
                 <div class="d-inline-block text-end">
-                    <div class="fw-bold lh-1" style="font-size: 0.75rem;">mahesh.amirthalingam@xyz.com
+                    <div class="fw-bold lh-1" style="font-size: 0.75rem;">{{userInfo?.username}}
                     </div>
                     <div class="text-muted small lh-1 mt-1" style="font-size: 0.75rem;">Author</div>
                 </div>
@@ -42,7 +42,7 @@
         <!-- Current Editing Tab -->
         <div class="tab-pane fade show active" id="current" role="tabpanel" aria-labelledby="current-tab">
             <div class="row">
-                <div class="col-md-4 mb-4">
+                <div class="col-md-3 mb-4">
                     <div class="book-cover-placeholder">
                         <div class="text-center">
                             <i class="fas fa-book fa-3x mb-3"></i>
@@ -50,100 +50,47 @@
                         </div>
                     </div>
                     <div class="mt-3 text-start small">
-                        <p class="mb-1"><strong>ISBN:</strong> 978-3-16-148410-0</p>
-                        <p class="mb-1"><strong>Date:</strong> 14 Feb 2026</p>
-                        <p class="mb-1"><strong>PM Name:</strong> Sarah Connor</p>
-                        <p class="mb-0"><strong>PM Email:</strong> <a href="mailto:sarah.connor@thomsondigital.com"
+                        <p class="mb-1"><strong>ISBN: </strong> 978-3-16-148410-0</p>
+                        <p class="mb-1"><strong>Date: </strong> 14 Feb 2026</p>
+                        <p class="mb-1"><strong>PM Name: </strong> Sarah Connor</p>
+                        <p class="mb-0"><strong>PM Email: </strong> <a href="mailto:sarah.connor@thomsondigital.com"
                                 class="text-decoration-none">sarah.connor@thomsondigital.com</a></p>
                     </div>
                 </div>
-                <div class="col-md-8 position-relative">
-                    <h3 class="mb-3">Chapter 1: The Beginning</h3>
-                    <h4 class="text-muted mb-4">Introduction to Neural Networks</h4>
-
-                    <div class="card bg-light mb-4">
-                        <div class="card-body" style="font-size: 0.85rem;">
-                            <h5 class="card-title fw-bold"><i class="fas fa-info-circle me-2"></i>Quick Reference
-                                Guide</h5>
-
-                            <div class="groupFocus" id="Introduction">
-                                <p><strong>Welcome to Thomson Digital Uniproof</strong>, the online collaborative
-                                    platform
-                                    tailor made for authoring, copyediting and
-                                    proofing journal content. </p>
-                                <p>Please follow the instructions below:</p>
-                                <ul class="notesList notesListIopp">
-                                    <li>Review your proof carefully and make necessary <strong>amendments directly
-                                            into the article.</strong></li>
-                                    <li>Resolve (reply or accept) all <strong>Author Queries (AQs)</strong>
-                                        displayed in the panel on the right-hand
-                                        side. Press “Reply” to provide information if requested. Press “Accept” if
-                                        the query simply requires
-                                        acknowledgement.</li>
-                                    <li>You can edit author and affiliation information, tables, equations,
-                                        citations, references and replace images
-                                        in Thomson Digital Uniproof. <strong>Add a comment</strong> if you are
-                                        unable to make a
-                                        certain change.</li>
-                                    <li>The article will be auto-saved every minute or can be saved manually by
-                                        pressing the Save button at the
-                                        top-right-hand side of the screen. You can close the link and reopen to
-                                        continue proofing if required.</li>
-
-                                    <li>The <strong>PDF proof will not reflect the corrections</strong> you enter in
-                                        Thomson Digital Uniproof and is for reference
-                                        only. If you wish to export a record of the changes you have made, press the
-                                        Record of Changes button; this
-                                        will prompt you to download an HTML file with changes tracked, but is not an
-                                        updated proof.</li>
-                                    <li>To provide a general comment to the editor, insert a comment and select "To
-                                        Editor" from the drop-down
-                                        options underneath.</li>
-                                    <li><strong>Submit the article</strong> when you have reviewed the entire
-                                        article and resolved all the Author
-                                        Queries.</li>
-                                    <li>When you Submit your article, you will be asked if you would like to
-                                        download the <strong>Record of
-                                            Changes</strong>; press Yes to download this file, or No to proceed with
-                                        submission.</li>
-                                    <li>If you need assistance with Thomson Digital, please contact our support team
-                                        at
-                                        <strong><a
-                                                href="mailto:product.support@thomsondigital.com">product.support@thomsondigital.com</a></strong>
-                                    </li>
-                                    <li>For any other queries relating to your article, contact the journal mailbox.
-                                    </li>
-                                    <li><strong>If you are not able to use Thomson Digital to make your corrections,
-                                            please
-                                            annotate the PDF proof and
-                                            upload it using the Upload Files option <svg class="paperclip"
-                                                xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
-                                                width="24px" fill="#000000">
-                                                <path d="M0 0h24v24H0V0z" fill="none"></path>
-                                                <path
-                                                    d="M2 12.5C2 9.46 4.46 7 7.5 7H18c2.21 0 4 1.79 4 4s-1.79 4-4 4H9.5C8.12 15 7 13.88 7 12.5S8.12 10 9.5 10H17v2H9.41c-.55 0-.55 1 0 1H18c1.1 0 2-.9 2-2s-.9-2-2-2H7.5C5.57 9 4 10.57 4 12.5S5.57 16 7.5 16H17v2H7.5C4.46 18 2 15.54 2 12.5z">
-                                                </path>
-                                            </svg> from the Home panel on the left-hand side or main toolbar at the
-                                            top.</strong> You should then
-                                        answer the queries and Submit your article.</li>
-                                    <li>Note that some browser add-ons can impact on the performance of Thomson
-                                        Digital. If
-                                        you are having problems,
-                                        <strong>disable any add-ons</strong> to see if that helps.
-                                    </li>
-                                    <li>You can access the Quick Reference Guide and User manual from the Help menu
-                                        <svg class="helpicon" xmlns="http://www.w3.org/2000/svg" height="24px"
-                                            viewBox="0 0 24 24" width="24px" fill="#000000">
-                                            <path d="M0 0h24v24H0z" fill="none"></path>
-                                            <path
-                                                d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z">
-                                            </path>
-                                        </svg> in the top-right corner of the screen.
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                <div class="col-md-9 position-relative">
+                    <h4 class="mb-3">{{curretDocLst?.projectType}}</h4>
+                    <h5 class="text-muted mb-4">{{curretDocLst?.projectTitle}}</h5>
+                    <div class="table-responsive" style="font-size: 0.9rem;">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <!-- <th scope="col">Chapter No.</th> -->
+                                    <th scope="col">Chapter Title</th>
+                                    <th scope="col">Last Updated By</th>
+                                    <th scope="col">Created Date</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                               @for (chapter of curretDocLst?.documents; track chapter.documentId) {
+                                <tr>
+                                    <!-- <td>{{chapter.itemSequenceNumber}}</td> -->
+                                    <td>{{chapter.title}}</td>
+                                    <td>{{chapter.lastUpdatedBy}}</td>
+                                    <td>{{chapter.createdAt | date:'dd MMM yyyy'}}</td>
+                                    <td><span class="badge bg-info">{{chapter.status}}</span></td>
+                                    <td>
+                                        <button class="btn btn-outline-primary btn-sm" [routerLink]="['/editor', chapter.documentId]"> Proceed <i
+                                class="fas fa-arrow-right ms-2"></i></button>
+                                        
+                                    </td>
+                                </tr>
+                               }
+                            </tbody>
+                        </table>
                     </div>
+                    
 
                     <div class="d-flex justify-content-end mt-5">
                         <a routerLink="editor" class="btn btn-primary px-4 py-2 fw-bold">PROCEED <i
@@ -151,6 +98,91 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card bg-light mb-4">
+                <div class="card-body" style="font-size: 0.85rem;">
+                    <h5 class="card-title fw-bold"><i class="fas fa-info-circle me-2"></i>Quick Reference
+                        Guide</h5>
+
+                    <div class="groupFocus" id="Introduction">
+                        <p><strong>Welcome to Thomson Digital Uniproof</strong>, the online collaborative
+                            platform
+                            tailor made for authoring, copyediting and
+                            proofing journal content. </p>
+                        <p>Please follow the instructions below:</p>
+                        <ul class="notesList notesListIopp">
+                            <li>Review your proof carefully and make necessary <strong>amendments directly
+                                    into the article.</strong></li>
+                            <li>Resolve (reply or accept) all <strong>Author Queries (AQs)</strong>
+                                displayed in the panel on the right-hand
+                                side. Press “Reply” to provide information if requested. Press “Accept” if
+                                the query simply requires
+                                acknowledgement.</li>
+                            <li>You can edit author and affiliation information, tables, equations,
+                                citations, references and replace images
+                                in Thomson Digital Uniproof. <strong>Add a comment</strong> if you are
+                                unable to make a
+                                certain change.</li>
+                            <li>The article will be auto-saved every minute or can be saved manually by
+                                pressing the Save button at the
+                                top-right-hand side of the screen. You can close the link and reopen to
+                                continue proofing if required.</li>
+
+                            <li>The <strong>PDF proof will not reflect the corrections</strong> you enter in
+                                Thomson Digital Uniproof and is for reference
+                                only. If you wish to export a record of the changes you have made, press the
+                                Record of Changes button; this
+                                will prompt you to download an HTML file with changes tracked, but is not an
+                                updated proof.</li>
+                            <li>To provide a general comment to the editor, insert a comment and select "To
+                                Editor" from the drop-down
+                                options underneath.</li>
+                            <li><strong>Submit the article</strong> when you have reviewed the entire
+                                article and resolved all the Author
+                                Queries.</li>
+                            <li>When you Submit your article, you will be asked if you would like to
+                                download the <strong>Record of
+                                    Changes</strong>; press Yes to download this file, or No to proceed with
+                                submission.</li>
+                            <li>If you need assistance with Thomson Digital, please contact our support team
+                                at
+                                <strong><a
+                                        href="mailto:product.support@thomsondigital.com">product.support@thomsondigital.com</a></strong>
+                            </li>
+                            <li>For any other queries relating to your article, contact the journal mailbox.
+                            </li>
+                            <li><strong>If you are not able to use Thomson Digital to make your corrections,
+                                    please
+                                    annotate the PDF proof and
+                                    upload it using the Upload Files option <svg class="paperclip"
+                                        xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                                        width="24px" fill="#000000">
+                                        <path d="M0 0h24v24H0V0z" fill="none"></path>
+                                        <path
+                                            d="M2 12.5C2 9.46 4.46 7 7.5 7H18c2.21 0 4 1.79 4 4s-1.79 4-4 4H9.5C8.12 15 7 13.88 7 12.5S8.12 10 9.5 10H17v2H9.41c-.55 0-.55 1 0 1H18c1.1 0 2-.9 2-2s-.9-2-2-2H7.5C5.57 9 4 10.57 4 12.5S5.57 16 7.5 16H17v2H7.5C4.46 18 2 15.54 2 12.5z">
+                                        </path>
+                                    </svg> from the Home panel on the left-hand side or main toolbar at the
+                                    top.</strong> You should then
+                                answer the queries and Submit your article.</li>
+                            <li>Note that some browser add-ons can impact on the performance of Thomson
+                                Digital. If
+                                you are having problems,
+                                <strong>disable any add-ons</strong> to see if that helps.
+                            </li>
+                            <li>You can access the Quick Reference Guide and User manual from the Help menu
+                                <svg class="helpicon" xmlns="http://www.w3.org/2000/svg" height="24px"
+                                    viewBox="0 0 24 24" width="24px" fill="#000000">
+                                    <path d="M0 0h24v24H0z" fill="none"></path>
+                                    <path
+                                        d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z">
+                                    </path>
+                                </svg> in the top-right corner of the screen.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <!-- Overall Others Tab -->

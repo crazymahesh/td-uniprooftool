@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, NgZone, ChangeDetectionStrategy, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, NgZone, ChangeDetectionStrategy, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxEditorModule, Editor, Toolbar, NgxEditorFloatingMenuComponent } from 'ngx-editor';
 import { CommentService } from '../../services/comment.service';
 import { jatsToHtmlMaster } from '../../utils/jats-to-html';
+import { htmlToJatsWithTemplate } from '../../utils/html-to-jats';
 import { ArticleService } from '../../services/article.service';
 import { FigureMetadata, extractFiguresFromXml } from './figure.model';
 // 🔹 Table schema & PM plugins
@@ -26,20 +27,22 @@ import {
 
 import { tableSchema } from './editor-schema';
 import { imageSelectionPlugin } from './image-selection-plugin';
-
 @Component({
   selector: 'app-editor-component',
   standalone: true,
   imports: [CommonModule, FormsModule, NgxEditorModule],
   templateUrl: './editor-component.html',
-  styleUrl: './editor-component.css',
+  styleUrls: ['./editor-component.css'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
+
+  @Input() documentId: string | null = null;
+  @Input() documentDetails: any = null;
 
   htmlContent = '';
-
+  private originalJatsXml = '';
   // htmlContent = `<h4>Chapter 1: The Beginning</h4><h2 class="h4 fw-bold mb-3">1.1 Introduction to Neural Networks</h2>
   //               <p class="mb-3">Neural networks are a subset of machine learning and are at the heart of deep
   //                   learning algorithms. Their name and structure are inspired by the human brain, mimicking the way
@@ -235,6 +238,15 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  getUpdatedJatsXml(): string {
+    if (!this.originalJatsXml) {
+      throw new Error('Original JATS XML is not loaded yet.');
+    }
+
+    const updatedHtml = this.getUpdatedHtmlContent();
+    return htmlToJatsWithTemplate(updatedHtml, this.originalJatsXml);
+  }
+
   ngOnInit(): void {
     this.schema = tableSchema;
 
@@ -257,21 +269,98 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (!changes['documentDetails']) {
+      return;
+    }
+
+    const xml = this.extractJatsXmlFromDocumentDetails(changes['documentDetails'].currentValue);
+    if (xml) {
+      this.applyJatsXmlToEditor(xml);
+    }
+  }
+
   ngAfterViewInit(): void {
     // Delay content loading to ensure ngx-editor is fully initialized
     setTimeout(() => {
+      const xmlFromDetails = this.extractJatsXmlFromDocumentDetails(this.documentDetails);
+      if (xmlFromDetails) {
+        this.applyJatsXmlToEditor(xmlFromDetails);
+        return;
+      }
+
+      // When editing a routed document, wait for parent-provided API payload instead of loading mock XML.
+      if (this.documentId) {
+        console.warn('[EditorComponent] Waiting for parent documentDetails response for documentId:', this.documentId);
+        return;
+      }
+
       this.articleService.getArticleXML().subscribe({
         next: (xml) => {
-          this.htmlContent = jatsToHtmlMaster(xml);
-          // Extract figures from XML and emit to parent
-          const figures = extractFiguresFromXml(xml);
-          this.figuresExtracted.emit(figures);
-          this.cdr.markForCheck();
+          this.applyJatsXmlToEditor(xml);
         },
         error: (err) => console.error('Error loading article XML', err)
       });
     }, 100);
     this.cdr.detectChanges();
+  }
+
+  private applyJatsXmlToEditor(xml: string): void {
+    if (!xml || xml === this.originalJatsXml) {
+      return;
+    }
+
+    this.originalJatsXml = xml;
+    this.htmlContent = jatsToHtmlMaster(xml);
+    const figures = extractFiguresFromXml(xml);
+    this.figuresExtracted.emit(figures);
+    this.cdr.markForCheck();
+  }
+
+  private extractJatsXmlFromDocumentDetails(details: any): string | null {
+    if (!details) {
+      return null;
+    }
+
+    if (typeof details === 'string') {
+      const trimmed = details.trim();
+      return trimmed.startsWith('<') ? trimmed : null;
+    }
+
+    const candidateKeys = [
+      'jatsXml',
+      'jatsXML',
+      'xml',
+      'XML',
+      'xmlContent',
+      'articleXml',
+      'documentXml',
+      'sourceXml',
+      'contentXml',
+      'content',
+      'jats',
+      'documentContent'
+    ];
+
+    for (const key of candidateKeys) {
+      const value = details?.[key];
+      if (typeof value === 'string' && value.trim().startsWith('<')) {
+        return value;
+      }
+    }
+
+    const nestedKeys = ['latestVersion', 'version', 'documentVersion', 'data', 'payload'];
+    for (const key of nestedKeys) {
+      const nested = details?.[key];
+      if (nested) {
+        const nestedXml = this.extractJatsXmlFromDocumentDetails(nested);
+        if (nestedXml) {
+          return nestedXml;
+        }
+      }
+    }
+
+    return null;
   }
 
 

@@ -10,9 +10,9 @@
                 Uniproof</h4>
         </a>
         <div class="d-flex align-items-center ms-auto">
-            <span class="text-secondary me-3 small"><i class="fas fa-check-circle me-1"></i> Saved</span>
-            <button class="btn btn-outline-primary btn-sm me-2">Save</button>
-            <button class="btn btn-primary btn-sm me-2 fw-bold" (click)="submitDocument()" title="Convert HTML to JATS XML and download">Submit</button>
+            <span class="text-secondary me-3 small"><i class="fas fa-check-circle me-1"></i> {{ saveStatusText }}</span>
+            <button class="btn btn-outline-primary btn-sm me-2" (click)="onSave()">Save</button>
+            <button class="btn btn-primary btn-sm me-2 fw-bold" (click)="onSubmit()" title="Convert HTML to JATS XML and download">Submit</button>
             <button class="btn btn-outline-primary btn-sm me-2" (click)="openPreview()" title="Preview HTML content">Preview</button>
             <div class="ms-3 text-end">
                 <div class="d-inline-block text-end">
@@ -99,7 +99,7 @@
                 </div>
 
                 <!-- Search Filters -->
-                <div class="search-filters small mb-3 p-2 bg-light rounded border">
+                <!-- <div class="search-filters small mb-3 p-2 bg-light rounded border">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="matchCase" 
                             [(ngModel)]="searchFilters.matchCase">
@@ -114,7 +114,7 @@
                             Whole word
                         </label>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Search Results -->
                 <div *ngIf="searchText && searchResults.length > 0" class="search-results">
@@ -195,7 +195,7 @@
         </div> -->
 
         <!-- Writing Canvas -->
-        <app-editor-component (figuresExtracted)="onFiguresExtracted($event)"></app-editor-component>
+        <app-editor-component [documentId]="documentId" [documentDetails]="documentDetails" (figuresExtracted)="onFiguresExtracted($event)"></app-editor-component>
 
 
 
@@ -300,7 +300,7 @@
 <footer class="fixed-bottom bg-black text-white px-3"
     style="min-height: 40px; z-index: 1050; display: flex; align-items: center; justify-content: flex-end;">
     <div class="d-flex align-items-center small">
-        <span class="me-3 text-white-50">Last saved a few seconds ago</span>
+        <span class="me-3 text-white-50">{{ getLastSavedLabel() }}</span>
         <div class="d-flex align-items-center border-start border-secondary ps-3">
             <i class="fas fa-search-minus me-2 text-white-50"></i>
             <input type="range" class="form-range" min="1" max="100" value="100" id="zoomRange" style="width: 100px;">

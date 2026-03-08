@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Component, HostListener, OnInit,inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
+import { HttpClient } from '@angular/common/http';
+import { APP_CONSTANTS } from '../../app.constants';
+import { UserService } from '../../services/user.service';
+import { CommonServices } from '../../services/common-services';
 interface Chapter {
   chapterNo: number;
   title: string;
@@ -14,9 +18,9 @@ interface Chapter {
 @Component({
   standalone: true,
   selector: 'app-landing',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './landing.html',
-  styleUrl: './landing.css',
+  styleUrls:  ['./landing.css'],
 })
 export class Landing implements OnInit {
   allChapters: Chapter[] = [
@@ -55,8 +59,33 @@ export class Landing implements OnInit {
   private itemsPerPage = 8;
   private currentPage = 1;
   private isLoading = false;
-
+  private commonServices = inject(CommonServices);
+  userInfo: any = null;
+  curretDocLst: any = null;
+  constructor(private http: HttpClient, private userService: UserService) {
+    this.userService.user$.subscribe((res: any) => {
+      if (!res || Object.keys(res).length === 0) {
+        console.warn('[Landing] Received empty user info:', res);
+        this.userInfo = null; 
+        return;
+      }
+      this.userInfo = res.payload || res;
+      console.log('[Landing] User info updated:', this.userInfo);
+    });
+  }
+  getCurrentDocument() {
+    this.commonServices.getCurrentDocument().subscribe(
+      (response:any) => {
+        
+        this.curretDocLst = response.payload || response;
+      },
+      (error:any) => {
+        console.error('Failed to fetch current document info:', error);
+      }
+    );
+  }
   ngOnInit(): void {
+    this.getCurrentDocument();
     this.filteredChapters = [...this.allChapters];
     this.loadMoreChapters();
   }

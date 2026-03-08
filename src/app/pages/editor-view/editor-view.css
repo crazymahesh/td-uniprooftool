@@ -10,7 +10,16 @@
    position: relative;
    z-index: 1;
  }
+#leftSidebarTab .nav-link {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    color: var(--secondary-color) !important;
+}
+#rightSidebarTab .nav-pills .nav-link.active, .nav-pills .show>.nav-link{
+  background-color: var(--primary-color) !important;
+    color: #fff !important;
 
+}
  .editor-sidebar {
    position: relative;
    z-index: 1000;

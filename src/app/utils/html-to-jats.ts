@@ -1,277 +1,409 @@
-/**
- * Convert HTML content back to JATS XML format
- * This is a reverse transformation of jatsToHtml
- */
+const XLINK_NS = 'http://www.w3.org/1999/xlink';
 
-export function htmlToJats(htmlContent: string): string {
-  if (!htmlContent || htmlContent.trim() === '') {
-    return '<?xml version="1.0" encoding="UTF-8"?><article></article>';
-  }
+function sanitizeTemplateXmlForParsing(xml: string): string {
+  // Convert common HTML entities to numeric references so XML parsing stays strict but tolerant.
+  const htmlEntityMap: Record<string, string> = {
+    '&nbsp;': '&#160;',
+    '&mdash;': '&#8212;',
+    '&ndash;': '&#8211;',
+    '&hellip;': '&#8230;',
+    '&ldquo;': '&#8220;',
+    '&rdquo;': '&#8221;',
+    '&lsquo;': '&#8216;',
+    '&rsquo;': '&#8217;'
+  };
 
-  try {
-    // Parse the HTML content
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(`<root>${htmlContent}</root>`, 'text/html');
-    
-    if (parser.parseFromString('', 'text/html').getElementsByTagName('parsererror').length > 0) {
-      console.error('HTML parsing error');
-      return '<?xml version="1.0" encoding="UTF-8"?><article></article>';
-    }
-
-    const root = doc.body.firstElementChild as HTMLElement;
-    
-    // Build JATS structure
-    let jatsXml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    jatsXml += '<article xmlns:xlink="http://www.w3.org/1999/xlink">\n';
-    jatsXml += '  <front>\n';
-    jatsXml += extractFrontMatter(root);
-    jatsXml += '  </front>\n';
-    jatsXml += '  <body>\n';
-    jatsXml += extractBodyContent(root);
-    jatsXml += '  </body>\n';
-    jatsXml += '</article>';
-
-    return jatsXml;
-  } catch (error) {
-    console.error('Error converting HTML to JATS:', error);
-    return '<?xml version="1.0" encoding="UTF-8"?><article></article>';
-  }
-}
-
-/**
- * Extract front matter (metadata, title, abstract, etc.)
- */
-function extractFrontMatter(root: Element): string {
-  let front = '';
-
-  // Extract article title (h1 or article-title)
-  const titleElement = root.querySelector('h1');
-  if (titleElement) {
-    front += `    <article-meta>\n`;
-    front += `      <title-group>\n`;
-    front += `        <article-title>${escapeXml(titleElement.textContent || '')}</article-title>\n`;
-    front += `      </title-group>\n`;
-    front += `    </article-meta>\n`;
-  }
-
-  // Extract authors from paragraphs with author class
-  const authors = root.querySelectorAll('p.author, .author');
-  if (authors.length > 0) {
-    front += `    <contrib-group>\n`;
-    authors.forEach((author) => {
-      front += `      <contrib contrib-type="author">\n`;
-      front += `        <name>\n`;
-      front += `          <surname>${escapeXml(author.textContent || '')}</surname>\n`;
-      front += `        </name>\n`;
-      front += `      </contrib>\n`;
-    });
-    front += `    </contrib-group>\n`;
-  }
-
-  // Extract abstract
-  const abstractElement = root.querySelector('p.lead, .abstract, p[class*="abstract"]');
-  if (abstractElement) {
-    front += `    <abstract>\n`;
-    front += `      <p>${escapeXml(abstractElement.textContent || '')}</p>\n`;
-    front += `    </abstract>\n`;
-  }
-
-  return front;
-}
-
-/**
- * Extract body content recursively
- */
-function extractBodyContent(root: Element): string {
-  let body = '';
-  let firstParagraphProcessed = false;
-
-  // Process all child elements
-  root.childNodes.forEach((node) => {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = node as HTMLElement;
-      
-      // Skip title, author, abstract elements as they belong to front
-      if (['H1', 'H2'].includes(element.tagName) && !firstParagraphProcessed) {
-        firstParagraphProcessed = true;
-        return;
-      }
-      if (element.classList.contains('lead') || element.classList.contains('author')) {
-        return;
-      }
-
-      const content = elementToJats(element);
-      if (content.trim()) {
-        body += content;
-      }
-    }
+  let sanitized = xml;
+  Object.entries(htmlEntityMap).forEach(([entity, numeric]) => {
+    sanitized = sanitized.replaceAll(entity, numeric);
   });
 
-  return body;
+  // Escape every ampersand that is not part of a valid XML entity reference.
+  // This handles source text like "R&D" that otherwise breaks DOMParser(application/xml).
+  sanitized = sanitized.replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;');
+
+  return sanitized;
 }
 
-/**
- * Convert individual HTML element to JATS XML
- * Preserves ID attributes from HTML elements
- */
-function elementToJats(element: HTMLElement, depth = 1): string {
-  const indent = '    '.repeat(depth);
-  let result = '';
-  const elementId = element.getAttribute('id') ? ` id="${escapeXml(element.getAttribute('id') || '')}"` : '';
+function findElementByLocalName(parent: Document | Element, localName: string): Element | null {
+  const children = parent.childNodes;
 
-  switch (element.tagName.toLowerCase()) {
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    if (child.nodeType !== Node.ELEMENT_NODE) {
+      continue;
+    }
+
+    const el = child as Element;
+    const currentName = (el.localName || el.tagName).toLowerCase();
+    if (currentName === localName.toLowerCase()) {
+      return el;
+    }
+
+    const nested = findElementByLocalName(el, localName);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return null;
+}
+
+function appendConvertedChildren(
+  sourceNodes: NodeListOf<ChildNode> | ChildNode[],
+  target: Element,
+  xmlDoc: XMLDocument,
+  ns: string | null
+): void {
+  Array.from(sourceNodes).forEach((child) => {
+    const converted = convertHtmlNodeToJats(child, xmlDoc, ns);
+    converted.forEach((node) => target.appendChild(node));
+  });
+}
+
+function createElement(xmlDoc: XMLDocument, ns: string | null, name: string): Element {
+  return ns ? xmlDoc.createElementNS(ns, name) : xmlDoc.createElement(name);
+}
+
+function normalizeGraphicPath(path: string): string {
+  if (!path) {
+    return path;
+  }
+
+  return path
+    .replace(/^\/?img\/xml-img\//i, '')
+    .replace(/^\/?public\/img\/xml-img\//i, '')
+    .trim();
+}
+
+function buildGraphicFromImage(imgEl: Element, xmlDoc: XMLDocument, ns: string | null): Element {
+  const graphic = createElement(xmlDoc, ns, 'graphic');
+  const src = imgEl.getAttribute('src') || '';
+  const href = normalizeGraphicPath(src);
+
+  if (href) {
+    graphic.setAttributeNS(XLINK_NS, 'xlink:href', href);
+  }
+
+  return graphic;
+}
+
+function convertTableChild(node: Node, xmlDoc: XMLDocument, ns: string | null): Node[] {
+  if (node.nodeType === Node.TEXT_NODE) {
+    const text = node.textContent || '';
+    return text.trim() ? [xmlDoc.createTextNode(text)] : [];
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return [];
+  }
+
+  const el = node as Element;
+  const tag = el.tagName.toLowerCase();
+
+  if (!['thead', 'tbody', 'tr', 'th', 'td'].includes(tag)) {
+    return [];
+  }
+
+  const out = createElement(xmlDoc, ns, tag);
+  appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, out, xmlDoc, ns);
+  return [out];
+}
+
+function convertHtmlNodeToJats(node: Node, xmlDoc: XMLDocument, ns: string | null): Node[] {
+  if (node.nodeType === Node.TEXT_NODE) {
+    const text = node.textContent || '';
+    return text.trim() ? [xmlDoc.createTextNode(text)] : [];
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return [];
+  }
+
+  const el = node as Element;
+  const tag = el.tagName.toLowerCase();
+
+  switch (tag) {
+    case 'main':
+    case 'article':
+    case 'div': {
+      const nodes: Node[] = [];
+      Array.from(el.childNodes).forEach((child) => {
+        nodes.push(...convertHtmlNodeToJats(child, xmlDoc, ns));
+      });
+      return nodes;
+    }
+
+    case 'p': {
+      const p = createElement(xmlDoc, ns, 'p');
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, p, xmlDoc, ns);
+      return [p];
+    }
+
+    case 'strong':
+    case 'b': {
+      const bold = createElement(xmlDoc, ns, 'bold');
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, bold, xmlDoc, ns);
+      return [bold];
+    }
+
+    case 'em':
+    case 'i': {
+      const italic = createElement(xmlDoc, ns, 'italic');
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, italic, xmlDoc, ns);
+      return [italic];
+    }
+
+    case 'u': {
+      const underline = createElement(xmlDoc, ns, 'underline');
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, underline, xmlDoc, ns);
+      return [underline];
+    }
+
+    case 'sub':
+    case 'sup': {
+      const out = createElement(xmlDoc, ns, tag);
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, out, xmlDoc, ns);
+      return [out];
+    }
+
+    case 'blockquote': {
+      const quote = createElement(xmlDoc, ns, 'disp-quote');
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, quote, xmlDoc, ns);
+      return [quote];
+    }
+
+    case 'section': {
+      const sec = createElement(xmlDoc, ns, 'sec');
+      const secId = el.getAttribute('id');
+      if (secId) {
+        sec.setAttribute('id', secId);
+      }
+
+      let titleAdded = false;
+      Array.from(el.childNodes).forEach((child) => {
+        if (child.nodeType === Node.ELEMENT_NODE) {
+          const childEl = child as Element;
+          const childTag = childEl.tagName.toLowerCase();
+
+          if (!titleAdded && /^h[1-6]$/.test(childTag)) {
+            const titleText = (childEl.textContent || '').trim();
+            if (titleText) {
+              const title = createElement(xmlDoc, ns, 'title');
+              title.appendChild(xmlDoc.createTextNode(titleText));
+              sec.appendChild(title);
+              titleAdded = true;
+            }
+            return;
+          }
+        }
+
+        const converted = convertHtmlNodeToJats(child, xmlDoc, ns);
+        converted.forEach((n) => sec.appendChild(n));
+      });
+
+      return [sec];
+    }
+
     case 'h1':
     case 'h2':
     case 'h3':
     case 'h4':
     case 'h5':
-    case 'h6':
-      result += `${indent}<sec${elementId}>\n`;
-      result += `${indent}  <title>${escapeXml(element.textContent || '')}</title>\n`;
-      result += `${indent}</sec>\n`;
-      break;
-
-    case 'p':
-      result += `${indent}<p>${escapeXml(element.textContent || '')}</p>\n`;
-      break;
-
-    case 'figure':
-      const figId = element.getAttribute('id') ? ` id="${escapeXml(element.getAttribute('id') || '')}"` : '';
-      result += `${indent}<fig${figId}>\n`;
-      // Extract label and caption
-      const label = element.querySelector('label, .label');
-      if (label) {
-        result += `${indent}  <label>${escapeXml(label.textContent || '')}</label>\n`;
-      }
-
-      // Extract image
-      const img = element.querySelector('img');
-      if (img) {
-        const src = img.getAttribute('src') || '';
-        // Remove /img/xml-img/ prefix if present
-        const cleanSrc = src.replace(/^\/img\/xml-img\//, '');
-        result += `${indent}  <graphic xlink:href="${escapeXml(cleanSrc)}" />\n`;
-      }
-
-      // Extract caption (figcaption or disp-quote)
-      const caption = element.querySelector('figcaption, .figure-caption, disp-quote, .disp-quote');
-      if (caption) {
-        result += `${indent}  <caption>\n`;
-        result += `${indent}    <p>${escapeXml(caption.textContent || '')}</p>\n`;
-        result += `${indent}  </caption>\n`;
-      }
-
-      result += `${indent}</fig>\n`;
-      break;
+    case 'h6': {
+      const sec = createElement(xmlDoc, ns, 'sec');
+      const title = createElement(xmlDoc, ns, 'title');
+      title.appendChild(xmlDoc.createTextNode((el.textContent || '').trim()));
+      sec.appendChild(title);
+      return [sec];
+    }
 
     case 'ul':
-    case 'ol':
-      const listType = element.tagName.toLowerCase() === 'ul' ? 'bullet' : 'order';
-      result += `${indent}<list list-type="${listType}">\n`;
-      element.querySelectorAll(':scope > li').forEach((li) => {
-        result += `${indent}  <list-item>\n`;
-        result += `${indent}    <p>${escapeXml(li.textContent || '')}</p>\n`;
-        result += `${indent}  </list-item>\n`;
-      });
-      result += `${indent}</list>\n`;
-      break;
+    case 'ol': {
+      const list = createElement(xmlDoc, ns, 'list');
+      list.setAttribute('list-type', tag === 'ol' ? 'ordered' : 'bullet');
 
-    case 'table':
-      result += `${indent}<table-wrap>\n`;
-      result += `${indent}  <table>\n`;
-      element.querySelectorAll('tr').forEach((tr) => {
-        result += `${indent}    <tr>\n`;
-        tr.querySelectorAll('td, th').forEach((td) => {
-          const tagName = td.tagName.toLowerCase() === 'th' ? 'th' : 'td';
-          result += `${indent}      <${tagName}>${escapeXml(td.textContent || '')}</${tagName}>\n`;
+      Array.from(el.children)
+        .filter((child) => child.tagName.toLowerCase() === 'li')
+        .forEach((li) => {
+          const convertedLi = convertHtmlNodeToJats(li, xmlDoc, ns);
+          convertedLi.forEach((n) => list.appendChild(n));
         });
-        result += `${indent}    </tr>\n`;
-      });
-      result += `${indent}  </table>\n`;
-      result += `${indent}</table-wrap>\n`;
-      break;
 
-    case 'blockquote':
-      result += `${indent}<disp-quote>\n`;
-      result += `${indent}  <p>${escapeXml(element.textContent || '')}</p>\n`;
-      result += `${indent}</disp-quote>\n`;
-      break;
+      return [list];
+    }
 
-    case 'section':
-    case 'div':
-      if (element.classList.contains('section') || element.tagName === 'SECTION') {
-        const sectionId = element.getAttribute('id') ? ` id="${escapeXml(element.getAttribute('id') || '')}"` : '';
-        result += `${indent}<sec${sectionId}>\n`;
-        element.childNodes.forEach((child) => {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            result += elementToJats(child as HTMLElement, depth + 1);
-          }
-        });
-        result += `${indent}</sec>\n`;
-      } else {
-        // Generic div - process children
-        element.childNodes.forEach((child) => {
-          if (child.nodeType === Node.ELEMENT_NODE) {
-            result += elementToJats(child as HTMLElement, depth);
-          }
-        });
+    case 'li': {
+      const listItem = createElement(xmlDoc, ns, 'list-item');
+      const p = createElement(xmlDoc, ns, 'p');
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, p, xmlDoc, ns);
+
+      if (p.childNodes.length > 0) {
+        listItem.appendChild(p);
       }
-      break;
 
-    case 'strong':
-    case 'b':
-      result += `<bold>${escapeXml(element.textContent || '')}</bold>`;
-      break;
+      return [listItem];
+    }
 
-    case 'em':
-    case 'i':
-      result += `<italic>${escapeXml(element.textContent || '')}</italic>`;
-      break;
+    case 'a': {
+      const href = el.getAttribute('href') || '';
 
-    case 'u':
-      result += `<underline>${escapeXml(element.textContent || '')}</underline>`;
-      break;
+      if (href.startsWith('#')) {
+        const xref = createElement(xmlDoc, ns, 'xref');
+        xref.setAttribute('rid', href.slice(1));
+        appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, xref, xmlDoc, ns);
+        return [xref];
+      }
 
-    case 'sub':
-      result += `<sub>${escapeXml(element.textContent || '')}</sub>`;
-      break;
+      const extLink = createElement(xmlDoc, ns, 'ext-link');
+      extLink.setAttribute('ext-link-type', 'uri');
+      if (href) {
+        extLink.setAttributeNS(XLINK_NS, 'xlink:href', href);
+      }
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, extLink, xmlDoc, ns);
+      return [extLink];
+    }
 
-    case 'sup':
-      result += `<sup>${escapeXml(element.textContent || '')}</sup>`;
-      break;
+    case 'figure': {
+      const fig = createElement(xmlDoc, ns, 'fig');
+      const id = el.getAttribute('id') || el.getAttribute('data-id');
+      if (id) {
+        fig.setAttribute('id', id);
+      }
 
-    case 'a':
-      const href = element.getAttribute('href') || '';
-      result += `<ext-link xlink:href="${escapeXml(href)}">${escapeXml(element.textContent || '')}</ext-link>`;
-      break;
-
-    default:
-      // For unknown elements, process children
-      element.childNodes.forEach((child) => {
-        if (child.nodeType === Node.ELEMENT_NODE) {
-          result += elementToJats(child as HTMLElement, depth);
-        } else if (child.nodeType === Node.TEXT_NODE) {
-          const text = child.textContent || '';
-          if (text.trim()) {
-            result += escapeXml(text);
-          }
+      const captionEl = el.querySelector('figcaption');
+      if (captionEl) {
+        const caption = createElement(xmlDoc, ns, 'caption');
+        const captionP = createElement(xmlDoc, ns, 'p');
+        appendConvertedChildren(captionEl.childNodes as NodeListOf<ChildNode>, captionP, xmlDoc, ns);
+        if (captionP.childNodes.length > 0) {
+          caption.appendChild(captionP);
+          fig.appendChild(caption);
         }
-      });
-  }
+      }
 
-  return result;
+      const imgEl = el.querySelector('img');
+      if (imgEl) {
+        fig.appendChild(buildGraphicFromImage(imgEl, xmlDoc, ns));
+      }
+
+      return [fig];
+    }
+
+    case 'img': {
+      const fig = createElement(xmlDoc, ns, 'fig');
+      fig.appendChild(buildGraphicFromImage(el, xmlDoc, ns));
+      return [fig];
+    }
+
+    case 'table': {
+      const tableWrap = createElement(xmlDoc, ns, 'table-wrap');
+      const table = createElement(xmlDoc, ns, 'table');
+
+      Array.from(el.childNodes).forEach((child) => {
+        const converted = convertTableChild(child, xmlDoc, ns);
+        converted.forEach((n) => table.appendChild(n));
+      });
+
+      tableWrap.appendChild(table);
+      return [tableWrap];
+    }
+
+    case 'thead':
+    case 'tbody':
+    case 'tr':
+    case 'th':
+    case 'td': {
+      const out = createElement(xmlDoc, ns, tag);
+      appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, out, xmlDoc, ns);
+      return [out];
+    }
+
+    case 'span': {
+      const className = el.getAttribute('class') || '';
+
+      if (className.includes('search-highlight')) {
+        const nodes: Node[] = [];
+        Array.from(el.childNodes).forEach((child) => {
+          nodes.push(...convertHtmlNodeToJats(child, xmlDoc, ns));
+        });
+        return nodes;
+      }
+
+      if (className.includes('citation')) {
+        const xref = createElement(xmlDoc, ns, 'xref');
+        const citationId = el.getAttribute('data-citation-id') || '';
+        if (citationId) {
+          xref.setAttribute('rid', citationId);
+          xref.setAttribute('ref-type', 'bibr');
+        }
+        appendConvertedChildren(el.childNodes as NodeListOf<ChildNode>, xref, xmlDoc, ns);
+        return [xref];
+      }
+
+      const nodes: Node[] = [];
+      Array.from(el.childNodes).forEach((child) => {
+        nodes.push(...convertHtmlNodeToJats(child, xmlDoc, ns));
+      });
+      return nodes;
+    }
+
+    default: {
+      const nodes: Node[] = [];
+      Array.from(el.childNodes).forEach((child) => {
+        nodes.push(...convertHtmlNodeToJats(child, xmlDoc, ns));
+      });
+      return nodes;
+    }
+  }
 }
 
 /**
- * Escape special XML characters
+ * Converts editor HTML back to JATS XML and preserves original metadata/front structure.
  */
-function escapeXml(text: string): string {
-  if (!text) return '';
-  
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+export function htmlToJatsWithTemplate(htmlContent: string, templateJatsXml: string): string {
+  const xmlParser = new DOMParser();
+  const htmlParser = new DOMParser();
+
+  const safeTemplate = sanitizeTemplateXmlForParsing(templateJatsXml);
+  const xmlDoc = xmlParser.parseFromString(safeTemplate, 'application/xml');
+  const parseErrors = xmlDoc.getElementsByTagName('parsererror');
+  if (parseErrors.length > 0) {
+    throw new Error(parseErrors[0].textContent || 'Unable to parse template JATS XML');
+  }
+
+  const article = findElementByLocalName(xmlDoc, 'article');
+  if (!article) {
+    throw new Error('Template JATS XML does not contain an article element');
+  }
+
+  const body = findElementByLocalName(article, 'body');
+  if (!body) {
+    throw new Error('Template JATS XML does not contain a body element');
+  }
+
+  const articleNs = article.namespaceURI || null;
+
+  const htmlDoc = htmlParser.parseFromString(htmlContent || '', 'text/html');
+  const mainEl = htmlDoc.querySelector('main');
+  const contentRoot = mainEl || htmlDoc.body;
+
+  while (body.firstChild) {
+    body.removeChild(body.firstChild);
+  }
+
+  appendConvertedChildren(contentRoot.childNodes as NodeListOf<ChildNode>, body, xmlDoc, articleNs);
+
+  if (!body.childNodes.length) {
+    const emptyP = createElement(xmlDoc, articleNs, 'p');
+    body.appendChild(emptyP);
+  }
+
+  const serializer = new XMLSerializer();
+  const serialized = serializer.serializeToString(xmlDoc);
+
+  const xmlDeclMatch = templateJatsXml.match(/^\s*(<\?xml[^>]*\?>)/i);
+  const xmlDecl = xmlDeclMatch ? `${xmlDeclMatch[1]}\n` : '';
+
+  return `${xmlDecl}${serialized}`;
 }
