@@ -471,3 +471,10 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
   }
 
 }
+/*
+http://localhost:8080/apt-tool/api/v1/attachments/upload?documentId=2  (documentId Param) - Payload: FormData with file field
+http://localhost:8080/apt-tool/api/v1/documents/2/saveNewVersion (documentId Param) (Payload: { "xmlContent": "string" })
+{
+  "xmlContent": "string"
+}
+*/
