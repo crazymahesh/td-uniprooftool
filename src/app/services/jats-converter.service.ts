@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { APP_CONSTANTS } from '../app.constants';
 
 /**
  * Service to convert JATS XML to HTML
@@ -520,9 +521,11 @@ export class JatsConverterService {
   }
 
   private convertGraphic(element: Element): string {
-    const href = element.getAttribute('xlink:href') || 
+    const rawHref = element.getAttribute('xlink:href') || 
                  element.getAttributeNS('http://www.w3.org/1999/xlink', 'href') ||
                  element.getAttribute('href') || '';
+    const normalized = rawHref && !rawHref.startsWith('/') ? `/img/xml-img/${rawHref}` : rawHref;
+    const href = normalized ? `${APP_CONSTANTS.FIGURE_BASE_URL}${normalized}` : '';
     const alt = element.getAttribute('alt') || 'Figure';
     
     return `<img src="${href}" class="figure-img img-fluid rounded" alt="${alt}" style="max-width: 100%; max-height: 400px;">`;

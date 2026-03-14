@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, OnDestroy, ViewEncapsulation, ViewChild, NgZone, ChangeDetectorRef } from '@angular/core';
 import { EditorComponent } from '../../components/editor-component/editor-component';
 import { CommentService } from '../../services/comment.service';
@@ -7,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { LoaderService } from '../../services/loader.service';
+import { UserService } from '../../services/user.service';
 import { CommonServices } from '../../services/common-services';
 
 @Component({
@@ -35,18 +37,29 @@ export class EditorView implements OnInit, OnDestroy {
     wholeWord: false,
     useRegex: false
   };
-  
+  userInfo: any = null;
   private searchHighlightTimeout: any;
   private subscription: Subscription = new Subscription();
 
   @ViewChild(EditorComponent) editorComponent!: EditorComponent;
 
   constructor(
+    private http: HttpClient, private userService: UserService,
     private commentService: CommentService,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute
-  ) { }
+  ) { 
+    this.userService.user$.subscribe((res: any) => {
+      if (!res || Object.keys(res).length === 0) {
+        console.warn('[Editor View] Received empty user info:', res);
+        this.userInfo = null; 
+        return;
+      }
+      this.userInfo = res.payload || res;
+      console.log('[Editor View] User info updated:', this.userInfo);
+    });
+  }
 
   ngOnInit(): void {
     this.subscription.add(
@@ -579,6 +592,7 @@ export class EditorView implements OnInit, OnDestroy {
     try {
       const jatsXml = this.editorComponent.getUpdatedJatsXml();
       localStorage.setItem('uniproof-jats-draft', jatsXml);
+      console.log('JATS draft saved to localStorage', jatsXml);
       this.lastSavedAt = new Date();
       this.saveStatusText = 'Saved';
       console.log('JATS draft saved successfully');

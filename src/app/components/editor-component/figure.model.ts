@@ -1,3 +1,5 @@
+import { APP_CONSTANTS } from '../../app.constants';
+
 /**
  * Figure metadata extracted from JATS XML
  */
@@ -150,7 +152,8 @@ function extractFigureMetadata(figEl: Element, figureNumber: number): FigureMeta
     const href = graphicEl.getAttribute('xlink:href') || 
                  graphicEl.getAttribute('href');
     if (href) {
-      figMetadata.imagePath = href.startsWith('/') ? href : `/img/xml-img/${href}`;
+      const normalizedHref = href.startsWith('/') ? href : `/img/xml-img/${href}`;
+      figMetadata.imagePath = `${APP_CONSTANTS.FIGURE_BASE_URL}${normalizedHref}`;
     }
   }
 

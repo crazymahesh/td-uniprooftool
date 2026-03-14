@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, NgZone, ChangeDetectionStrategy, Output, EventEmitter, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, AfterViewInit, ViewEncapsulation, ChangeDetectorRef, NgZone, ChangeDetectionStrategy, Output, EventEmitter, SimpleChanges, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxEditorModule, Editor, Toolbar, NgxEditorFloatingMenuComponent } from 'ngx-editor';
@@ -24,6 +24,7 @@ import {
   splitCell as pmSplitCell,
   goToNextCell,
 } from 'prosemirror-tables';
+import { safeInsert } from 'prosemirror-utils';
 
 import { tableSchema } from './editor-schema';
 import { imageSelectionPlugin } from './image-selection-plugin';
@@ -121,8 +122,8 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     ['undo', 'redo'],
     ['bold', 'italic', 'underline'],
     ['subscript', 'superscript'],
-    ['code', 'blockquote'],
-    ['ordered_list', 'bullet_list'],
+    ['blockquote', 'ordered_list', 'bullet_list'],
+   
     [{ heading: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] }],
     ['link', 'image'],
     ['text_color', 'background_color'],
@@ -138,8 +139,8 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
 
   // Table dropdown state
   showTableDropdown = false;
-  gridRows = 8;
-  gridCols = 10;
+  gridRows = 5;
+  gridCols = 8;
   hoveredRow = 0;
   hoveredCol = 0;
   // Citation modal state
@@ -373,12 +374,36 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
 
   toggleTableDropdown(): void {
     this.showTableDropdown = !this.showTableDropdown;
+    if (!this.showTableDropdown) {
+      this.hoveredRow = 0;
+      this.hoveredCol = 0;
+    }
+    this.cdr.markForCheck();
+  }
+
+  preserveEditorSelection(event: MouseEvent): void {
+    event.preventDefault();
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  onDocumentMouseDown(event: MouseEvent): void {
+    if (!this.showTableDropdown) {
+      return;
+    }
+
+    const target = event.target as Element | null;
+    if (target?.closest('.table-dropdown-wrapper')) {
+      return;
+    }
+
+    this.closeTableDropdown();
   }
 
   closeTableDropdown(): void {
     this.showTableDropdown = false;
     this.hoveredRow = 0;
     this.hoveredCol = 0;
+    this.cdr.markForCheck();
   }
 
   onGridCellHover(row: number, col: number): void {
@@ -399,11 +424,23 @@ export class EditorComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
   }
 
   insertTable(rows = 3, cols = 3, withHeaderRow = true): void {
-    const { state } = this.editor.view;
+    if (!this.editor?.view) {
+      return;
+    }
+
     const view = this.editor.view;
     const table = this.buildTable(this.schema, rows, cols, withHeaderRow);
-    const tr = state.tr.replaceSelectionWith(table).scrollIntoView();
-    view.dispatch(tr);
+
+    view.focus();
+
+    const nextTransaction = safeInsert(table)(view.state.tr);
+    if (nextTransaction.docChanged) {
+      view.dispatch(nextTransaction.scrollIntoView());
+    } else {
+      const tr = view.state.tr.replaceSelectionWith(table).scrollIntoView();
+      view.dispatch(tr);
+    }
+
     view.focus();
   }
 

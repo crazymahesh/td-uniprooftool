@@ -1,4 +1,10 @@
 // utils/jats-to-html.ts
+import { APP_CONSTANTS } from '../app.constants';
+
+function resolveImagePath(href: string): string {
+  const normalized = href && !href.startsWith('/') ? `/img/xml-img/${href}` : href;
+  return normalized ? `${APP_CONSTANTS.FIGURE_BASE_URL}${normalized}` : '';
+}
 
 /**
  * Master JATS to HTML converter that preserves all XML attributes and tags
@@ -151,7 +157,7 @@ export function jatsToHtmlMaster(xml: string): string {
         if (tagName === 'fig') {
           const imgPath = el.querySelector('graphic')?.getAttribute('xlink:href') || 
                           el.querySelector('graphic')?.getAttribute('href') || '';
-          const resolvedPath = imgPath && !imgPath.startsWith('/') ? `/img/xml-img/${imgPath}` : imgPath;
+          const resolvedPath = resolveImagePath(imgPath);
           
           // Get children HTML excluding graphic elements (already handled above)
           const nonGraphicChildren = Array.from(el.childNodes)
@@ -486,7 +492,7 @@ export function jatsToHtml(xml: string): string {
                 
                 // Handle standalone graphic/inline-graphic as figures
                 const imgPath = graphic.getAttribute('xlink:href') || graphic.getAttribute('href') || '';
-                const resolvedPath = imgPath && !imgPath.startsWith('/') ? `/img/xml-img/${imgPath}` : imgPath;
+                const resolvedPath = resolveImagePath(imgPath);
                 const figId = graphic.getAttribute('id') || '';
                 const figIdAttr = figId ? ` id="${figId}"` : '';
                 const dataIdAttr = figId ? ` data-id="${figId}"` : '';
@@ -513,10 +519,8 @@ export function jatsToHtml(xml: string): string {
               el.querySelector('graphic')?.getAttribute('href') ||
               '';
 
-            if (imgPath && !imgPath.startsWith('/')) {
-              imgPath = `/img/xml-img/${imgPath}`;
-            }
-
+            imgPath = resolveImagePath(imgPath);
+            console.log('Processed figure image path:', imgPath);
             const captionEl = el.querySelector('caption');
             const captionHtml = captionEl ? nodeToHtml(captionEl) : '';
 
